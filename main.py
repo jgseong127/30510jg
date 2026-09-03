@@ -3,21 +3,20 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 st.set_page_config(
-    page_title="NEON RHYTHM DUEL",
+    page_title="Neon Rhythm Duel",
     page_icon="🎵",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-GAME_HTML = r"""
+html_code = r"""
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-
 * {
     box-sizing: border-box;
     margin: 0;
@@ -29,42 +28,33 @@ html, body {
     height: 100%;
     overflow: hidden;
     font-family: Arial, sans-serif;
+    background: #080818;
     color: white;
-    background: #050510;
 }
 
 body {
-    animation: backgroundShift 20s infinite alternate ease-in-out;
+    animation: bgChange 15s infinite alternate ease-in-out;
 }
 
-@keyframes backgroundShift {
-
+@keyframes bgChange {
     0% {
-        background:
-        radial-gradient(circle at top, #14235c, #050510 70%);
+        background: radial-gradient(circle at top, #102060, #050510 70%);
     }
-
     25% {
-        background:
-        radial-gradient(circle at top, #4b155b, #050510 70%);
+        background: radial-gradient(circle at top, #501050, #050510 70%);
     }
-
     50% {
-        background:
-        radial-gradient(circle at top, #064d55, #050510 70%);
+        background: radial-gradient(circle at top, #005050, #050510 70%);
     }
-
     75% {
-        background:
-        radial-gradient(circle at top, #523a08, #050510 70%);
+        background: radial-gradient(circle at top, #504000, #050510 70%);
     }
-
     100% {
-        background:
-        radial-gradient(circle at top, #172d63, #050510 70%);
+        background: radial-gradient(circle at top, #202060, #050510 70%);
     }
-
 }
+
+/* 전체 게임 */
 
 #game {
     width: 100vw;
@@ -73,396 +63,425 @@ body {
     overflow: hidden;
 }
 
+/* 메뉴 */
 
-/* ===============================
-   TOP HUD
-================================ */
+.screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 15, 0.88);
+    backdrop-filter: blur(10px);
+}
+
+#countdownScreen,
+#resultScreen {
+    display: none;
+}
+
+.title {
+    font-size: 58px;
+    font-weight: 900;
+    letter-spacing: 5px;
+
+    background: linear-gradient(
+        90deg,
+        #00ffff,
+        #ff00ff,
+        #ffff00
+    );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    text-align: center;
+}
+
+.subtitle {
+    margin-top: 15px;
+    color: #dddddd;
+    text-align: center;
+    line-height: 1.8;
+}
+
+/* 선택 메뉴 */
+
+.menu-section {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.menu-title {
+    margin-bottom: 12px;
+    font-size: 20px;
+    color: #00ffff;
+}
+
+.button-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.select-button {
+    padding: 13px 22px;
+
+    border-radius: 12px;
+
+    border: 1px solid rgba(255,255,255,0.3);
+
+    background: rgba(255,255,255,0.08);
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+    transition: 0.2s;
+}
+
+.select-button:hover {
+    transform: scale(1.05);
+    border-color: #00ffff;
+}
+
+.select-button.selected {
+    background: linear-gradient(
+        90deg,
+        #0088ff,
+        #b000ff
+    );
+
+    box-shadow:
+        0 0 15px #00ffff,
+        0 0 30px #b000ff;
+}
+
+.start-button {
+    margin-top: 30px;
+
+    padding: 16px 65px;
+
+    border: none;
+
+    border-radius: 15px;
+
+    color: white;
+
+    font-size: 22px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    background: linear-gradient(
+        90deg,
+        #00aaff,
+        #b000ff
+    );
+
+    box-shadow:
+        0 0 20px #00aaff,
+        0 0 40px #b000ff;
+
+    transition: 0.2s;
+}
+
+.start-button:hover {
+    transform: scale(1.08);
+}
+
+/* 카운트다운 */
+
+#countdownNumber {
+    font-size: 150px;
+    font-weight: bold;
+
+    text-shadow:
+        0 0 25px #00ffff,
+        0 0 60px #ff00ff;
+}
+
+/* 상단 점수판 */
 
 #topbar {
-
     position: absolute;
 
-    top: 18px;
+    top: 15px;
     left: 0;
 
     width: 100%;
 
-    display: flex;
+    padding: 0 35px;
 
+    display: flex;
     justify-content: space-between;
 
-    padding: 0 45px;
-
     z-index: 100;
-
-    pointer-events: none;
-
 }
 
-.player-score {
+.player-box {
+    width: 280px;
 
-    width: 300px;
+    padding: 15px;
 
-    padding: 16px;
-
-    border-radius: 18px;
+    border-radius: 16px;
 
     background: rgba(0,0,0,0.45);
 
-    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.2);
 
-    border:
-    1px solid rgba(255,255,255,0.15);
-
+    backdrop-filter: blur(10px);
 }
 
-.p1 {
-
-    box-shadow:
-    0 0 25px rgba(0,255,255,0.25);
-
+.player1 {
+    box-shadow: 0 0 20px rgba(0,255,255,0.25);
 }
 
-.p2 {
-
-    box-shadow:
-    0 0 25px rgba(255,0,200,0.25);
-
+.player2 {
+    box-shadow: 0 0 20px rgba(255,0,255,0.25);
 }
 
 .player-name {
-
-    font-size: 20px;
-
+    font-size: 19px;
     font-weight: bold;
-
-    letter-spacing: 2px;
-
 }
 
 .score {
-
-    font-size: 32px;
-
-    margin-top: 5px;
-
+    font-size: 30px;
     font-weight: bold;
 
+    margin-top: 5px;
 }
 
 .combo {
-
-    font-size: 18px;
-
+    color: #ffff00;
     margin-top: 5px;
-
-    color: #ffe600;
-
 }
 
-#timerBox {
-
+#centerInfo {
     text-align: center;
+}
 
-    font-size: 25px;
-
+#timer {
+    font-size: 28px;
     font-weight: bold;
-
-    text-shadow:
-    0 0 15px white;
-
 }
 
-#songName {
-
-    font-size: 15px;
-
-    color: #00ffff;
-
+#songDisplay {
     margin-top: 5px;
-
+    color: #00ffff;
 }
 
-#difficulty {
-
-    font-size: 14px;
-
-    color: #dddddd;
-
+#difficultyDisplay {
     margin-top: 4px;
-
+    color: #dddddd;
 }
 
-
-/* ===============================
-   ARENA
-================================ */
+/* 게임판 */
 
 #arena {
-
     position: absolute;
 
-    top: 100px;
+    top: 110px;
 
     width: 100%;
-
-    height: calc(100% - 100px);
+    height: calc(100% - 110px);
 
     display: flex;
 
     justify-content: space-around;
 
     perspective: 900px;
-
 }
 
 .board {
-
     position: relative;
 
-    width: 42%;
+    width: 43%;
+    height: 85%;
 
-    height: 88%;
-
-    transform:
-    rotateX(18deg);
-
-    transform-style:
-    preserve-3d;
-
+    transform: rotateX(14deg);
+    transform-style: preserve-3d;
 }
 
 .lanes {
-
     position: absolute;
 
     width: 100%;
-
     height: 100%;
 
     display: flex;
 
-    gap: 10px;
+    gap: 8px;
 
-    padding: 0 20px;
-
+    padding: 0 15px;
 }
 
 .lane {
-
     position: relative;
 
     flex: 1;
 
     height: 100%;
 
-    overflow: visible;
-
-    background:
-
-    linear-gradient(
+    background: linear-gradient(
         to bottom,
-        rgba(255,255,255,0.03),
-        rgba(0,0,0,0.4)
+        rgba(255,255,255,0.04),
+        rgba(0,0,0,0.45)
     );
 
     border-left:
-    1px solid rgba(255,255,255,0.15);
+        1px solid rgba(255,255,255,0.15);
 
     border-right:
-    1px solid rgba(255,255,255,0.08);
+        1px solid rgba(255,255,255,0.08);
 
+    overflow: visible;
 }
 
-
-/* ===============================
-   JUDGEMENT LINE
-================================ */
+/* 판정선 */
 
 .judgement-line {
-
     position: absolute;
 
     bottom: 12%;
 
     width: 100%;
-
     height: 10px;
 
     background: white;
 
     box-shadow:
-
-    0 0 8px white,
-
-    0 0 20px #00ffff,
-
-    0 0 45px #00ffff;
+        0 0 8px white,
+        0 0 20px #00ffff,
+        0 0 40px #00ffff;
 
     z-index: 30;
-
 }
 
-
-/* ===============================
-   KEYS
-================================ */
-
-.key-label {
-
-    position: absolute;
-
-    bottom: 2%;
-
-    width: 100%;
-
-    display: flex;
-
-    gap: 10px;
-
-    padding: 0 20px;
-
-    z-index: 40;
-
-}
-
-.key {
-
-    flex: 1;
-
-    height: 55px;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    font-size: 24px;
-
-    font-weight: bold;
-
-    border-radius: 12px;
-
-    background:
-    rgba(0,0,0,0.7);
-
-    border:
-    2px solid rgba(255,255,255,0.4);
-
-    transition: 0.08s;
-
-}
-
-.key.active {
-
-    transform:
-    scale(0.90);
-
-    background: white;
-
-    color: black;
-
-    box-shadow:
-    0 0 25px white;
-
-}
-
-
-/* ===============================
-   TILES
-================================ */
+/* 타일 */
 
 .tile {
-
     position: absolute;
 
-    width:
-    calc(100% - 16px);
+    left: 7px;
 
-    left: 8px;
+    width: calc(100% - 14px);
 
-    height: 52px;
+    height: 45px;
 
-    border-radius: 12px;
+    border-radius: 10px;
 
     box-shadow:
-
-    0 0 12px currentColor,
-
-    0 0 35px currentColor;
+        0 0 10px currentColor,
+        0 0 28px currentColor;
 
     z-index: 15;
 
+    will-change: transform, top;
 }
 
 .tile::after {
-
     content: "";
 
     position: absolute;
 
     top: 5px;
-
     left: 5px;
-
     right: 5px;
-
     bottom: 5px;
 
-    border-radius: 8px;
+    border-radius: 7px;
 
-    background:
-    rgba(255,255,255,0.28);
-
+    background: rgba(255,255,255,0.25);
 }
 
 .tile.hit {
-
-    animation:
-    hitAnimation 0.25s forwards;
-
+    animation: tileHit 0.25s forwards;
 }
 
-@keyframes hitAnimation {
-
-    0% {
-
-        transform:
-        scale(1);
-
+@keyframes tileHit {
+    from {
+        transform: scale(1);
         opacity: 1;
-
     }
 
-    100% {
-
-        transform:
-        scale(1.8);
-
+    to {
+        transform: scale(1.7);
         opacity: 0;
-
     }
-
 }
 
+/* 키 */
 
-/* ===============================
-   JUDGEMENT TEXT
-================================ */
+.key-row {
+    position: absolute;
+
+    bottom: 1%;
+
+    width: 100%;
+
+    padding: 0 15px;
+
+    display: flex;
+
+    gap: 8px;
+
+    z-index: 50;
+}
+
+.key-box {
+    flex: 1;
+
+    height: 52px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: rgba(0,0,0,0.75);
+
+    border: 2px solid rgba(255,255,255,0.35);
+
+    font-size: 22px;
+    font-weight: bold;
+
+    transition: 0.08s;
+}
+
+.key-box.active {
+    transform: scale(0.92);
+
+    background: white;
+
+    color: black;
+
+    box-shadow: 0 0 25px white;
+}
+
+/* 판정 */
 
 .judge-text {
-
     position: absolute;
 
     left: 50%;
-
     top: 48%;
 
-    transform:
-    translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 
-    font-size: 42px;
+    font-size: 38px;
 
     font-weight: bold;
 
@@ -471,913 +490,468 @@ body {
     z-index: 200;
 
     pointer-events: none;
-
 }
 
 .judge-text.show {
-
-    animation:
-    judgeAnimation 0.7s forwards;
-
+    animation: judgeAnimation 0.65s forwards;
 }
 
 @keyframes judgeAnimation {
-
     0% {
-
         opacity: 0;
-
-        transform:
-        translate(-50%, -40%)
-        scale(0.7);
-
+        transform: translate(-50%, -40%) scale(0.7);
     }
 
-    30% {
-
+    25% {
         opacity: 1;
-
-        transform:
-        translate(-50%, -50%)
-        scale(1.2);
-
+        transform: translate(-50%, -50%) scale(1.2);
     }
 
     100% {
-
         opacity: 0;
+        transform: translate(-50%, -75%) scale(1);
+    }
+}
 
-        transform:
-        translate(-50%, -70%)
-        scale(1);
+/* 결과 */
 
+#winner {
+    font-size: 52px;
+    margin-bottom: 20px;
+}
+
+.result-text {
+    text-align: center;
+
+    font-size: 24px;
+
+    line-height: 2;
+}
+
+@media (max-width: 900px) {
+
+    .title {
+        font-size: 38px;
+    }
+
+    .player-box {
+        width: 180px;
+    }
+
+    #topbar {
+        padding: 0 10px;
     }
 
 }
-
-
-/* ===============================
-   MENU
-================================ */
-
-.screen {
-
-    position: absolute;
-
-    z-index: 1000;
-
-    width: 100%;
-
-    height: 100%;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-
-    align-items: center;
-
-    background:
-    rgba(0,0,10,0.88);
-
-    backdrop-filter:
-    blur(15px);
-
-}
-
-#resultScreen,
-#countdownScreen {
-
-    display: none;
-
-}
-
-.title {
-
-    font-size: 60px;
-
-    font-weight: 900;
-
-    letter-spacing: 7px;
-
-    background:
-
-    linear-gradient(
-        90deg,
-        #00ffff,
-        #ff00ff,
-        #ffff00
-    );
-
-    -webkit-background-clip: text;
-
-    color: transparent;
-
-}
-
-.subtitle {
-
-    margin-top: 15px;
-
-    font-size: 18px;
-
-    color: #cccccc;
-
-}
-
-.menu-section {
-
-    margin-top: 25px;
-
-    text-align: center;
-
-}
-
-.menu-title {
-
-    font-size: 20px;
-
-    margin-bottom: 12px;
-
-    color: #00ffff;
-
-}
-
-.buttons {
-
-    display: flex;
-
-    gap: 12px;
-
-    flex-wrap: wrap;
-
-    justify-content: center;
-
-}
-
-.menu-button {
-
-    padding:
-    14px 25px;
-
-    border-radius: 12px;
-
-    border:
-    1px solid rgba(255,255,255,0.25);
-
-    background:
-    rgba(255,255,255,0.08);
-
-    color: white;
-
-    font-size: 16px;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-
-}
-
-.menu-button:hover {
-
-    transform:
-    scale(1.07);
-
-    border-color:
-    #00ffff;
-
-}
-
-.menu-button.selected {
-
-    background:
-
-    linear-gradient(
-        90deg,
-        #0088ff,
-        #c000ff
-    );
-
-    box-shadow:
-
-    0 0 20px #00ffff;
-
-}
-
-.start-button {
-
-    margin-top: 28px;
-
-    padding:
-    16px 65px;
-
-    border: none;
-
-    border-radius: 15px;
-
-    font-size: 23px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    color: white;
-
-    background:
-
-    linear-gradient(
-        90deg,
-        #00bfff,
-        #b000ff
-    );
-
-    box-shadow:
-
-    0 0 25px #00bfff,
-
-    0 0 50px #b000ff;
-
-}
-
-#countdownNumber {
-
-    font-size: 150px;
-
-    font-weight: bold;
-
-    text-shadow:
-
-    0 0 30px #00ffff,
-
-    0 0 70px #ff00ff;
-
-}
-
-#winner {
-
-    font-size: 55px;
-
-    margin-bottom: 20px;
-
-}
-
-.result-score {
-
-    font-size: 25px;
-
-    line-height: 2;
-
-}
-
 </style>
 </head>
-
 
 <body>
 
 <div id="game">
 
+    <!-- 메뉴 -->
+    <div class="screen" id="menuScreen">
 
-<!-- ===============================
-     SONG MENU
-================================ -->
-
-<div class="screen" id="menuScreen">
-
-    <div class="title">
-        NEON RHYTHM DUEL
-    </div>
-
-    <div class="subtitle">
-
-        🎮 PLAYER 1: Q W E R
-        &nbsp;&nbsp;&nbsp;
-
-        🎮 PLAYER 2: O P [ ]
-
-    </div>
-
-
-    <div class="menu-section">
-
-        <div class="menu-title">
-            🎵 SONG SELECT
+        <div class="title">
+            NEON RHYTHM DUEL
         </div>
 
-        <div class="buttons">
+        <div class="subtitle">
+            PLAYER 1 : Q W E R<br>
+            PLAYER 2 : O P [ ]
+        </div>
 
-            <button
-            class="menu-button song selected"
-            data-song="Neon Drive">
-            🌃 Neon Drive
-            </button>
+        <div class="menu-section">
 
-            <button
-            class="menu-button song"
-            data-song="Cyber Rush">
-            ⚡ Cyber Rush
-            </button>
+            <div class="menu-title">
+                🎵 SONG SELECT
+            </div>
 
-            <button
-            class="menu-button song"
-            data-song="Galaxy Beat">
-            🌌 Galaxy Beat
-            </button>
+            <div class="button-row">
 
-            <button
-            class="menu-button song"
-            data-song="Final Overload">
-            🔥 Final Overload
-            </button>
+                <button class="select-button song selected" data-song="Neon Drive">
+                    🌃 Neon Drive
+                </button>
+
+                <button class="select-button song" data-song="Cyber Rush">
+                    ⚡ Cyber Rush
+                </button>
+
+                <button class="select-button song" data-song="Galaxy Beat">
+                    🌌 Galaxy Beat
+                </button>
+
+                <button class="select-button song" data-song="Final Overload">
+                    🔥 Final Overload
+                </button>
+
+            </div>
 
         </div>
 
+        <div class="menu-section">
+
+            <div class="menu-title">
+                ⭐ DIFFICULTY
+            </div>
+
+            <div class="button-row">
+
+                <button class="select-button difficulty selected" data-difficulty="Easy">
+                    EASY
+                </button>
+
+                <button class="select-button difficulty" data-difficulty="Normal">
+                    NORMAL
+                </button>
+
+                <button class="select-button difficulty" data-difficulty="Hard">
+                    HARD
+                </button>
+
+                <button class="select-button difficulty" data-difficulty="Expert">
+                    EXPERT
+                </button>
+
+            </div>
+
+        </div>
+
+        <button class="start-button" id="readyButton">
+            READY!
+        </button>
+
     </div>
 
 
-    <div class="menu-section">
+    <!-- 카운트다운 -->
+    <div class="screen" id="countdownScreen">
 
-        <div class="menu-title">
-            ⭐ DIFFICULTY
+        <div id="countdownNumber">
+            3
         </div>
 
-        <div class="buttons">
-
-            <button
-            class="menu-button difficulty selected"
-            data-difficulty="Easy">
-            EASY
-            </button>
-
-            <button
-            class="menu-button difficulty"
-            data-difficulty="Normal">
-            NORMAL
-            </button>
-
-            <button
-            class="menu-button difficulty"
-            data-difficulty="Hard">
-            HARD
-            </button>
-
-            <button
-            class="menu-button difficulty"
-            data-difficulty="Expert">
-            EXPERT
-            </button>
-
+        <div class="subtitle">
+            GET READY!
         </div>
 
     </div>
 
 
-    <button
-    class="start-button"
-    onclick="prepareGame()">
+    <!-- 결과 -->
+    <div class="screen" id="resultScreen">
 
-        READY?
-
-    </button>
-
-</div>
-
-
-
-<!-- ===============================
-     COUNTDOWN
-================================ -->
-
-<div
-class="screen"
-id="countdownScreen">
-
-    <div
-    id="countdownNumber">
-
-        3
-
-    </div>
-
-    <div
-    class="subtitle">
-
-        GET READY!
-
-    </div>
-
-</div>
-
-
-
-<!-- ===============================
-     RESULT
-================================ -->
-
-<div
-class="screen"
-id="resultScreen">
-
-    <div
-    id="winner">
-
-        PLAYER 1 WINS!
-
-    </div>
-
-    <div
-    class="result-score"
-    id="resultScore">
-
-    </div>
-
-    <button
-    class="start-button"
-    onclick="location.reload()">
-
-        PLAY AGAIN
-
-    </button>
-
-</div>
-
-
-
-<!-- ===============================
-     HUD
-================================ -->
-
-<div id="topbar">
-
-    <div
-    class="player-score p1">
-
-        <div class="player-name">
-            🔵 PLAYER 1
+        <div id="winner">
+            WINNER
         </div>
 
-        <div
-        class="score"
-        id="score1">
-            0
+        <div class="result-text" id="resultText">
         </div>
 
-        <div class="combo">
+        <button class="start-button" id="playAgainButton">
+            PLAY AGAIN
+        </button>
 
-            COMBO:
-            <span id="combo1">
+    </div>
+
+
+    <!-- 상단 UI -->
+    <div id="topbar">
+
+        <div class="player-box player1">
+
+            <div class="player-name">
+                🔵 PLAYER 1
+            </div>
+
+            <div class="score" id="score1">
                 0
-            </span>
+            </div>
+
+            <div class="combo">
+                COMBO: <span id="combo1">0</span>
+            </div>
 
         </div>
 
-    </div>
 
+        <div id="centerInfo">
 
-    <div id="timerBox">
+            <div id="timer">
+                01:00
+            </div>
 
-        <div id="timer">
-            01:00
+            <div id="songDisplay">
+                Neon Drive
+            </div>
+
+            <div id="difficultyDisplay">
+                EASY
+            </div>
+
         </div>
 
-        <div id="songName">
-            Neon Drive
-        </div>
 
-        <div id="difficulty">
-            EASY
-        </div>
+        <div class="player-box player2">
 
-    </div>
+            <div class="player-name">
+                🔴 PLAYER 2
+            </div>
 
-
-    <div
-    class="player-score p2">
-
-        <div class="player-name">
-            🔴 PLAYER 2
-        </div>
-
-        <div
-        class="score"
-        id="score2">
-            0
-        </div>
-
-        <div class="combo">
-
-            COMBO:
-
-            <span id="combo2">
+            <div class="score" id="score2">
                 0
-            </span>
+            </div>
+
+            <div class="combo">
+                COMBO: <span id="combo2">0</span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- 게임판 -->
+    <div id="arena">
+
+        <!-- PLAYER 1 -->
+        <div class="board" id="board1">
+
+            <div class="lanes">
+
+                <div class="lane"></div>
+                <div class="lane"></div>
+                <div class="lane"></div>
+                <div class="lane"></div>
+
+            </div>
+
+            <div class="judgement-line"></div>
+
+            <div class="key-row">
+
+                <div class="key-box" id="key-q">Q</div>
+                <div class="key-box" id="key-w">W</div>
+                <div class="key-box" id="key-e">E</div>
+                <div class="key-box" id="key-r">R</div>
+
+            </div>
+
+            <div class="judge-text" id="judge1"></div>
+
+        </div>
+
+
+        <!-- PLAYER 2 -->
+        <div class="board" id="board2">
+
+            <div class="lanes">
+
+                <div class="lane"></div>
+                <div class="lane"></div>
+                <div class="lane"></div>
+                <div class="lane"></div>
+
+            </div>
+
+            <div class="judgement-line"></div>
+
+            <div class="key-row">
+
+                <div class="key-box" id="key-o">O</div>
+                <div class="key-box" id="key-p">P</div>
+                <div class="key-box" id="key-bracketleft">[</div>
+                <div class="key-box" id="key-bracketright">]</div>
+
+            </div>
+
+            <div class="judge-text" id="judge2"></div>
 
         </div>
 
     </div>
 
 </div>
-
-
-
-<!-- ===============================
-     ARENA
-================================ -->
-
-<div id="arena">
-
-
-<!-- PLAYER 1 -->
-
-<div
-class="board"
-id="board1">
-
-    <div class="lanes">
-
-        <div class="lane"></div>
-        <div class="lane"></div>
-        <div class="lane"></div>
-        <div class="lane"></div>
-
-    </div>
-
-    <div
-    class="judgement-line">
-    </div>
-
-    <div
-    class="key-label">
-
-        <div
-        class="key"
-        id="key-q">
-            Q
-        </div>
-
-        <div
-        class="key"
-        id="key-w">
-            W
-        </div>
-
-        <div
-        class="key"
-        id="key-e">
-            E
-        </div>
-
-        <div
-        class="key"
-        id="key-r">
-            R
-        </div>
-
-    </div>
-
-    <div
-    class="judge-text"
-    id="judge1">
-    </div>
-
-</div>
-
-
-
-<!-- PLAYER 2 -->
-
-<div
-class="board"
-id="board2">
-
-    <div class="lanes">
-
-        <div class="lane"></div>
-        <div class="lane"></div>
-        <div class="lane"></div>
-        <div class="lane"></div>
-
-    </div>
-
-    <div
-    class="judgement-line">
-    </div>
-
-    <div
-    class="key-label">
-
-        <div
-        class="key"
-        id="key-o">
-            O
-        </div>
-
-        <div
-        class="key"
-        id="key-p">
-            P
-        </div>
-
-        <div
-        class="key"
-        id="key-[">
-            [
-        </div>
-
-        <div
-        class="key"
-        id="key-]">
-            ]
-        </div>
-
-    </div>
-
-    <div
-    class="judge-text"
-    id="judge2">
-    </div>
-
-</div>
-
-
-</div>
-
-</div>
-
 
 
 <script>
 
-/* =========================================
-   SETTINGS
-========================================= */
+/* =========================
+   기본 설정
+========================= */
 
 const GAME_DURATION = 60;
 
-const PLAYER1_KEYS =
-["q", "w", "e", "r"];
+const PLAYER1_KEYS = ["q", "w", "e", "r"];
 
-const PLAYER2_KEYS =
-["o", "p", "[", "]"];
+const PLAYER2_KEYS = ["o", "p", "[", "]"];
+
+const NEON_COLORS = [
+    "#00ffff",
+    "#ff00ff",
+    "#00ff88",
+    "#ffff00",
+    "#ff6600",
+    "#8a2bff"
+];
 
 
-/* =========================================
-   SONG DATA
-========================================= */
+/* =========================
+   곡 데이터
+========================= */
 
 const SONGS = {
-
     "Neon Drive": {
-
-        bpm: 100,
-
-        description:
-        "쉬운 네온 드라이브"
-
+        bpm: 100
     },
 
     "Cyber Rush": {
-
-        bpm: 115,
-
-        description:
-        "빠른 사이버 리듬"
-
+        bpm: 112
     },
 
     "Galaxy Beat": {
-
-        bpm: 130,
-
-        description:
-        "우주 스타일 비트"
-
+        bpm: 125
     },
 
     "Final Overload": {
-
-        bpm: 145,
-
-        description:
-        "최종 고속 배틀"
-
+        bpm: 138
     }
-
 };
 
 
-/* =========================================
-   DIFFICULTY DATA
-========================================= */
+/* =========================
+   난이도 데이터
+========================= */
 
 const DIFFICULTIES = {
 
     "Easy": {
-
-        intervalMultiplier: 1.45,
-
-        doubleChance: 0.03
-
+        spacing: 1.55,
+        doubleChance: 0.02
     },
 
     "Normal": {
-
-        intervalMultiplier: 1.15,
-
-        doubleChance: 0.10
-
+        spacing: 1.30,
+        doubleChance: 0.08
     },
 
     "Hard": {
-
-        intervalMultiplier: 0.95,
-
-        doubleChance: 0.22
-
+        spacing: 1.08,
+        doubleChance: 0.18
     },
 
     "Expert": {
-
-        intervalMultiplier: 0.78,
-
-        doubleChance: 0.38
-
+        spacing: 0.90,
+        doubleChance: 0.32
     }
-
 };
 
 
-const NEON_COLORS = [
+/* =========================
+   게임 상태
+========================= */
 
-    "#00ffff",
+let selectedSong = "Neon Drive";
 
-    "#ff00ff",
+let selectedDifficulty = "Easy";
 
-    "#00ff88",
+let gameStarted = false;
 
-    "#ffff00",
+let gameStartTime = 0;
 
-    "#ff6600",
-
-    "#8a2bff"
-
-];
-
-
-/* =========================================
-   GAME STATE
-========================================= */
-
-let selectedSong =
-"Neon Drive";
-
-let selectedDifficulty =
-"Easy";
-
-let gameStarted =
-false;
-
-let startTime =
-0;
-
-let animationFrame;
+let animationId = null;
 
 let notes = [];
 
 let scores = {
-
     1: 0,
     2: 0
-
 };
 
 let combos = {
-
     1: 0,
     2: 0
-
 };
 
-let audioContext;
 
+/* =========================
+   메뉴 선택
+========================= */
 
-/* =========================================
-   MENU BUTTONS
-========================================= */
+document.querySelectorAll(".song").forEach(function(button) {
 
-document
-.querySelectorAll(".song")
-.forEach(button => {
+    button.addEventListener("click", function() {
 
-    button.addEventListener(
-        "click",
-        () => {
+        document.querySelectorAll(".song").forEach(function(b) {
+            b.classList.remove("selected");
+        });
 
-            document
-            .querySelectorAll(".song")
-            .forEach(b =>
-                b.classList.remove("selected")
-            );
+        button.classList.add("selected");
 
-            button
-            .classList.add("selected");
+        selectedSong = button.dataset.song;
 
-            selectedSong =
-            button.dataset.song;
-
-        }
-    );
+    });
 
 });
 
 
-document
-.querySelectorAll(".difficulty")
-.forEach(button => {
+document.querySelectorAll(".difficulty").forEach(function(button) {
 
-    button.addEventListener(
-        "click",
-        () => {
+    button.addEventListener("click", function() {
 
-            document
-            .querySelectorAll(".difficulty")
-            .forEach(b =>
-                b.classList.remove("selected")
-            );
+        document.querySelectorAll(".difficulty").forEach(function(b) {
+            b.classList.remove("selected");
+        });
 
-            button
-            .classList.add("selected");
+        button.classList.add("selected");
 
-            selectedDifficulty =
-            button.dataset.difficulty;
+        selectedDifficulty = button.dataset.difficulty;
 
-        }
-    );
+    });
 
 });
 
 
-/* =========================================
-   PREPARE GAME
-========================================= */
+/* =========================
+   READY 버튼
+========================= */
 
-function prepareGame() {
-
-    document
-    .getElementById("menuScreen")
-    .style.display =
-    "none";
+document.getElementById("readyButton").addEventListener(
+    "click",
+    startCountdown
+);
 
 
-    document
-    .getElementById("countdownScreen")
-    .style.display =
-    "flex";
+function startCountdown() {
 
+    document.getElementById("menuScreen").style.display = "none";
+
+    document.getElementById("countdownScreen").style.display = "flex";
+
+    const number = document.getElementById("countdownNumber");
 
     let count = 3;
 
-    const countdownElement =
-    document.getElementById(
-        "countdownNumber"
-    );
+    number.textContent = count;
 
-
-    countdownElement.innerText =
-    count;
-
-
-    const countdown =
-    setInterval(() => {
+    const interval = setInterval(function() {
 
         count--;
 
-
         if (count > 0) {
 
-            countdownElement.innerText =
-            count;
+            number.textContent = count;
 
-        }
+        } else if (count === 0) {
 
-        else if (count === 0) {
+            number.textContent = "GO!";
 
-            countdownElement.innerText =
-            "GO!";
+        } else {
 
-        }
+            clearInterval(interval);
 
-        else {
-
-            clearInterval(countdown);
-
-            document
-            .getElementById(
-                "countdownScreen"
-            )
-            .style.display =
-            "none";
+            document.getElementById("countdownScreen").style.display = "none";
 
             startGame();
 
@@ -1388,261 +962,100 @@ function prepareGame() {
 }
 
 
-/* =========================================
-   AUDIO
-========================================= */
+/* =========================
+   게임 시작
+========================= */
 
-function initAudio() {
+function startGame() {
 
-    audioContext =
-    new (
-        window.AudioContext ||
-        window.webkitAudioContext
-    )();
+    gameStarted = true;
 
-}
+    scores[1] = 0;
+    scores[2] = 0;
 
-
-function playTone(
-    frequency,
-    duration = 0.08,
-    volume = 0.05
-) {
-
-    if (!audioContext) return;
-
-    const oscillator =
-    audioContext.createOscillator();
-
-    const gain =
-    audioContext.createGain();
-
-    oscillator.frequency.value =
-    frequency;
-
-    oscillator.type =
-    "sine";
-
-    gain.gain.value =
-    volume;
-
-    oscillator.connect(gain);
-
-    gain.connect(
-        audioContext.destination
-    );
-
-    oscillator.start();
-
-    gain.gain
-    .exponentialRampToValueAtTime(
-        0.001,
-        audioContext.currentTime + duration
-    );
-
-    oscillator.stop(
-        audioContext.currentTime + duration
-    );
-
-}
-
-
-/* =========================================
-   CREATE NOTE
-========================================= */
-
-function createNote(
-    player,
-    lane,
-    hitTime
-) {
-
-    const board =
-    document.getElementById(
-        player === 1
-        ? "board1"
-        : "board2"
-    );
-
-
-    const lanes =
-    board.querySelectorAll(".lane");
-
-
-    const note =
-    document.createElement("div");
-
-
-    note.className =
-    "tile";
-
-
-    const color =
-    NEON_COLORS[
-        Math.floor(
-            Math.random()
-            *
-            NEON_COLORS.length
-        )
-    ];
-
-
-    note.style.background =
-    color;
-
-
-    note.style.color =
-    color;
-
-
-    lanes[lane]
-    .appendChild(note);
-
-
-    notes.push({
-
-        player,
-
-        lane,
-
-        hitTime,
-
-        element: note,
-
-        hit: false,
-
-        /*
-        Faster tile movement
-        */
-
-        duration: 1800
-
-    });
-
-}
-
-
-/* =========================================
-   GENERATE SONG
-========================================= */
-
-function generateSong() {
+    combos[1] = 0;
+    combos[2] = 0;
 
     notes = [];
 
+    updateUI();
 
-    const song =
-    SONGS[selectedSong];
+    document.getElementById("songDisplay").textContent =
+        selectedSong;
 
+    document.getElementById("difficultyDisplay").textContent =
+        selectedDifficulty.toUpperCase();
 
-    const difficulty =
-    DIFFICULTIES[
-        selectedDifficulty
-    ];
+    generateSong();
 
+    gameStartTime = performance.now();
 
-    /*
-    BPM → beat interval
-    */
+    gameLoop();
 
-    const beat =
-    60000 / song.bpm;
+}
 
 
-    let time =
-    2500;
+/* =========================
+   노트 생성
+========================= */
 
+function generateSong() {
 
-    const totalTime =
-    GAME_DURATION * 1000;
+    const song = SONGS[selectedSong];
 
+    const difficulty = DIFFICULTIES[selectedDifficulty];
 
-    while (
-        time < totalTime
-    ) {
+    const beat = 60000 / song.bpm;
 
-        /*
-        Easier spacing
-        */
+    const totalTime = GAME_DURATION * 1000;
 
-        let interval =
-        beat
-        *
-        difficulty.intervalMultiplier;
+    let time = 2500;
 
+    while (time < totalTime) {
 
-        /*
-        Gradually harder
-        */
+        const progress = time / totalTime;
 
-        const progress =
-        time / totalTime;
+        const interval =
+            beat * difficulty.spacing;
 
-
-        for (
-            let player = 1;
-            player <= 2;
-            player++
-        ) {
+        for (let player = 1; player <= 2; player++) {
 
             const lane =
-            Math.floor(
-                Math.random() * 4
-            );
+                Math.floor(Math.random() * 4);
 
-
-            createNote(
-                player,
-                lane,
-                time
-            );
+            createNote(player, lane, time);
 
 
             /*
-            Double notes appear
-            mostly later in song
+            후반으로 갈수록
+            동시 타일 증가
             */
 
             if (
-
-                progress > 0.55
-
-                &&
-
-                Math.random()
-                <
-                difficulty.doubleChance
-                *
-                progress
-
+                progress > 0.45 &&
+                Math.random() <
+                difficulty.doubleChance * progress
             ) {
 
-                let lane2;
+                let secondLane;
 
                 do {
 
-                    lane2 =
-                    Math.floor(
-                        Math.random() * 4
-                    );
+                    secondLane =
+                        Math.floor(Math.random() * 4);
 
-                }
-
-                while (
-                    lane2 === lane
-                );
+                } while (secondLane === lane);
 
 
                 createNote(
                     player,
-                    lane2,
+                    secondLane,
                     time
                 );
 
             }
 
         }
-
 
         time += interval;
 
@@ -1651,173 +1064,158 @@ function generateSong() {
 }
 
 
-/* =========================================
-   START GAME
-========================================= */
+/* =========================
+   타일 생성
+========================= */
 
-function startGame() {
+function createNote(player, lane, hitTime) {
 
-    scores[1] = 0;
-    scores[2] = 0;
+    const boardId =
+        player === 1 ? "board1" : "board2";
 
-    combos[1] = 0;
-    combos[2] = 0;
+    const board =
+        document.getElementById(boardId);
 
+    const lanes =
+        board.querySelectorAll(".lane");
 
-    updateScoreUI();
+    const tile =
+        document.createElement("div");
 
+    tile.className = "tile";
 
-    document
-    .getElementById("songName")
-    .innerText =
-    selectedSong;
+    const color =
+        NEON_COLORS[
+            Math.floor(
+                Math.random() *
+                NEON_COLORS.length
+            )
+        ];
 
+    tile.style.background = color;
 
-    document
-    .getElementById("difficulty")
-    .innerText =
-    selectedDifficulty.toUpperCase();
+    tile.style.color = color;
 
+    tile.style.display = "none";
 
-    initAudio();
+    lanes[lane].appendChild(tile);
 
+    notes.push({
+        player: player,
+        lane: lane,
+        hitTime: hitTime,
+        element: tile,
+        hit: false,
 
-    generateSong();
-
-
-    gameStarted =
-    true;
-
-
-    startTime =
-    performance.now();
-
-
-    gameLoop();
+        /*
+        타일 이동 속도
+        낮을수록 빠름
+        */
+        travelTime: 1700
+    });
 
 }
 
 
-/* =========================================
-   GAME LOOP
-========================================= */
+/* =========================
+   게임 루프
+========================= */
 
 function gameLoop() {
 
-    if (!gameStarted) return;
+    if (!gameStarted) {
+        return;
+    }
 
-
-    const now =
-    performance.now();
-
+    const now = performance.now();
 
     const elapsed =
-    now - startTime;
-
+        now - gameStartTime;
 
     const remaining =
-    Math.max(
-        0,
-        GAME_DURATION * 1000 - elapsed
-    );
-
+        Math.max(
+            0,
+            GAME_DURATION * 1000 - elapsed
+        );
 
     updateTimer(remaining);
 
 
-    notes.forEach(note => {
+    notes.forEach(function(note) {
 
-        if (note.hit) return;
+        if (note.hit) {
+            return;
+        }
+
+        const appearTime =
+            note.hitTime - note.travelTime;
+
+        const progress =
+            (elapsed - appearTime) /
+            note.travelTime;
 
 
         /*
-        Tile starts far away
+        아직 등장할 시간이 아님
         */
-
-        const startTimeNote =
-        note.hitTime
-        -
-        note.duration;
-
-
-        const progress =
-        (
-            elapsed
-            -
-            startTimeNote
-        )
-        /
-        note.duration;
-
 
         if (progress < 0) {
 
-            note.element.style.display =
-            "none";
+            note.element.style.display = "none";
 
             return;
 
         }
 
 
-        note.element.style.display =
-        "block";
+        note.element.style.display = "block";
+
+
+        const p =
+            Math.min(
+                Math.max(progress, 0),
+                1.15
+            );
 
 
         /*
-        Faster perspective movement
+        원근감
         */
 
-        const p =
-        Math.min(
-            Math.max(progress, 0),
-            1.15
-        );
-
-
         const scale =
-        0.28
-        +
-        p * 0.82;
-
+            0.30 + p * 0.75;
 
         const y =
-        2
-        +
-        p * 82;
+            2 + p * 80;
 
 
         note.element.style.top =
-        y + "%";
-
+            y + "%";
 
         note.element.style.transform =
-        `scale(${scale})`;
+            "scale(" + scale + ")";
 
 
         /*
-        Automatic miss
+        지나간 타일 = 자동 MISS
         */
 
         if (progress > 1.10) {
 
             note.hit = true;
 
-            note.element.remove();
+            if (note.element.parentNode) {
+                note.element.remove();
+            }
 
-            registerMiss(
-                note.player
-            );
+            registerMiss(note.player);
 
         }
 
     });
 
 
-    if (
-        elapsed >=
-        GAME_DURATION * 1000
-    ) {
+    if (elapsed >= GAME_DURATION * 1000) {
 
         endGame();
 
@@ -1826,212 +1224,180 @@ function gameLoop() {
     }
 
 
-    animationFrame =
-    requestAnimationFrame(
-        gameLoop
-    );
+    animationId =
+        requestAnimationFrame(gameLoop);
 
 }
 
 
-/* =========================================
-   TIMER
-========================================= */
+/* =========================
+   타이머
+========================= */
 
-function updateTimer(
-    remaining
-) {
+function updateTimer(remaining) {
 
-    const seconds =
-    Math.ceil(
-        remaining / 1000
-    );
-
+    const totalSeconds =
+        Math.ceil(remaining / 1000);
 
     const minutes =
-    Math.floor(
-        seconds / 60
-    );
+        Math.floor(totalSeconds / 60);
 
+    const seconds =
+        totalSeconds % 60;
 
-    const secs =
-    seconds % 60;
-
-
-    document
-    .getElementById("timer")
-    .innerText =
-
-    String(minutes)
-    .padStart(2, "0")
-
-    +
-
-    ":"
-
-    +
-
-    String(secs)
-    .padStart(2, "0");
+    document.getElementById("timer").textContent =
+        String(minutes).padStart(2, "0")
+        +
+        ":"
+        +
+        String(seconds).padStart(2, "0");
 
 }
 
 
-/* =========================================
-   KEY INPUT
-========================================= */
+/* =========================
+   키 입력
+========================= */
 
-document.addEventListener(
-    "keydown",
-    event => {
+document.addEventListener("keydown", function(event) {
 
-        if (!gameStarted)
+    if (!gameStarted) {
         return;
+    }
 
-
-        if (event.repeat)
+    if (event.repeat) {
         return;
+    }
 
-
-        const key =
+    const key =
         event.key.toLowerCase();
 
 
-        if (
-            PLAYER1_KEYS.includes(key)
-            ||
-            PLAYER2_KEYS.includes(key)
-        ) {
-
-            event.preventDefault();
-
-        }
+    if (
+        PLAYER1_KEYS.includes(key) ||
+        PLAYER2_KEYS.includes(key)
+    ) {
+        event.preventDefault();
+    }
 
 
-        if (
-            PLAYER1_KEYS.includes(key)
-        ) {
+    if (PLAYER1_KEYS.includes(key)) {
 
-            const lane =
+        const lane =
             PLAYER1_KEYS.indexOf(key);
 
+        activateKey(key);
 
-            activateKey(key);
+        hitLane(1, lane);
 
-
-            hitLane(
-                1,
-                lane
-            );
-
-        }
+    }
 
 
-        if (
-            PLAYER2_KEYS.includes(key)
-        ) {
+    if (PLAYER2_KEYS.includes(key)) {
 
-            const lane =
+        const lane =
             PLAYER2_KEYS.indexOf(key);
 
+        activateKey(key);
 
-            activateKey(key);
-
-
-            hitLane(
-                2,
-                lane
-            );
-
-        }
+        hitLane(2, lane);
 
     }
-);
+
+});
 
 
-document.addEventListener(
-    "keyup",
-    event => {
+document.addEventListener("keyup", function(event) {
 
-        const key =
+    const key =
         event.key.toLowerCase();
 
+    deactivateKey(key);
 
-        const element =
-        document.getElementById(
-            "key-" + key
-        );
+});
 
 
-        if (element) {
-
-            element
-            .classList
-            .remove("active");
-
-        }
-
-    }
-);
-
+/* =========================
+   키 애니메이션
+========================= */
 
 function activateKey(key) {
 
-    const element =
-    document.getElementById(
-        "key-" + key
-    );
+    let elementId =
+        "key-" + key;
 
+
+    if (key === "[") {
+        elementId = "key-bracketleft";
+    }
+
+    if (key === "]") {
+        elementId = "key-bracketright";
+    }
+
+
+    const element =
+        document.getElementById(elementId);
 
     if (element) {
-
-        element
-        .classList
-        .add("active");
-
+        element.classList.add("active");
     }
 
 }
 
 
-/* =========================================
-   HIT DETECTION
-========================================= */
+function deactivateKey(key) {
 
-function hitLane(
-    player,
-    lane
-) {
+    let elementId =
+        "key-" + key;
+
+
+    if (key === "[") {
+        elementId = "key-bracketleft";
+    }
+
+    if (key === "]") {
+        elementId = "key-bracketright";
+    }
+
+
+    const element =
+        document.getElementById(elementId);
+
+    if (element) {
+        element.classList.remove("active");
+    }
+
+}
+
+
+/* =========================
+   타일 판정
+========================= */
+
+function hitLane(player, lane) {
 
     const elapsed =
-    performance.now()
-    -
-    startTime;
+        performance.now() - gameStartTime;
 
 
     const candidates =
-    notes.filter(note =>
+        notes.filter(function(note) {
 
-        note.player === player
+            return (
+                note.player === player &&
+                note.lane === lane &&
+                !note.hit
+            );
 
-        &&
-
-        note.lane === lane
-
-        &&
-
-        !note.hit
-
-    );
+        });
 
 
     /*
-    Empty lane = MISS
+    타일이 없으면 MISS
     */
 
-    if (
-        candidates.length === 0
-    ) {
+    if (candidates.length === 0) {
 
         registerMiss(player);
 
@@ -2040,41 +1406,32 @@ function hitLane(
     }
 
 
-    candidates.sort(
-        (a, b) =>
+    /*
+    가장 가까운 타일 찾기
+    */
 
-        Math.abs(
-            elapsed - a.hitTime
-        )
+    candidates.sort(function(a, b) {
 
-        -
+        return (
+            Math.abs(elapsed - a.hitTime)
+            -
+            Math.abs(elapsed - b.hitTime)
+        );
 
-        Math.abs(
-            elapsed - b.hitTime
-        )
-
-    );
+    });
 
 
-    const note =
-    candidates[0];
-
+    const note = candidates[0];
 
     const difference =
-    Math.abs(
-        elapsed
-        -
-        note.hitTime
-    );
+        Math.abs(elapsed - note.hitTime);
 
 
     /*
     PERFECT
     */
 
-    if (
-        difference <= 110
-    ) {
+    if (difference <= 120) {
 
         registerHit(
             player,
@@ -2092,9 +1449,7 @@ function hitLane(
     GREAT
     */
 
-    if (
-        difference <= 220
-    ) {
+    if (difference <= 240) {
 
         registerHit(
             player,
@@ -2109,7 +1464,7 @@ function hitLane(
 
 
     /*
-    Outside judgement timing
+    판정 범위 밖
     */
 
     registerMiss(player);
@@ -2117,9 +1472,9 @@ function hitLane(
 }
 
 
-/* =========================================
-   HIT
-========================================= */
+/* =========================
+   성공 처리
+========================= */
 
 function registerHit(
     player,
@@ -2128,43 +1483,24 @@ function registerHit(
     baseScore
 ) {
 
-    note.hit =
-    true;
-
+    note.hit = true;
 
     combos[player]++;
 
 
     /*
-    Combo bonus
+    콤보 보너스
     */
 
     const comboBonus =
-    Math.min(
-        combos[player] * 15,
-        1000
-    );
+        Math.min(
+            combos[player] * 15,
+            1000
+        );
 
 
     scores[player] +=
-
-    baseScore
-
-    +
-
-    comboBonus;
-
-
-    note.element
-    .classList
-    .add("hit");
-
-
-    setTimeout(() => {
-
-        note.element.remove();
-
-    }, 250);
+        baseScore + comboBonus;
 
 
     showJudgement(
@@ -2173,67 +1509,47 @@ function registerHit(
     );
 
 
-    if (
-        judgement === "PERFECT"
-    ) {
+    if (note.element.parentNode) {
 
-        playTone(
-            700,
-            0.07,
-            0.07
-        );
+        note.element.classList.add("hit");
 
-    }
+        setTimeout(function() {
 
-    else {
+            if (note.element.parentNode) {
+                note.element.remove();
+            }
 
-        playTone(
-            500,
-            0.07,
-            0.05
-        );
+        }, 250);
 
     }
 
 
-    updateScoreUI();
+    updateUI();
 
 }
 
 
-/* =========================================
+/* =========================
    MISS
-========================================= */
+========================= */
 
-function registerMiss(
-    player
-) {
+function registerMiss(player) {
 
-    combos[player] =
-    0;
-
+    combos[player] = 0;
 
     showJudgement(
         player,
         "MISS"
     );
 
-
-    playTone(
-        130,
-        0.10,
-        0.04
-    );
-
-
-    updateScoreUI();
+    updateUI();
 
 }
 
 
-/* =========================================
-   JUDGEMENT DISPLAY
-========================================= */
+/* =========================
+   판정 표시
+========================= */
 
 function showJudgement(
     player,
@@ -2241,191 +1557,134 @@ function showJudgement(
 ) {
 
     const element =
-    document.getElementById(
-
-        player === 1
-        ?
-
-        "judge1"
-
-        :
-
-        "judge2"
-
-    );
+        document.getElementById(
+            player === 1
+                ? "judge1"
+                : "judge2"
+        );
 
 
-    element.innerText =
-    judgement;
+    element.textContent =
+        judgement;
 
 
-    if (
-        judgement === "PERFECT"
-    ) {
+    if (judgement === "PERFECT") {
 
-        element.style.color =
-        "#00ffff";
+        element.style.color = "#00ffff";
 
-    }
+    } else if (judgement === "GREAT") {
 
-    else if (
-        judgement === "GREAT"
-    ) {
+        element.style.color = "#00ff88";
 
-        element.style.color =
-        "#00ff88";
+    } else {
 
-    }
-
-    else {
-
-        element.style.color =
-        "#ff3355";
+        element.style.color = "#ff3355";
 
     }
 
 
-    element
-    .classList
-    .remove("show");
-
+    element.classList.remove("show");
 
     void element.offsetWidth;
 
-
-    element
-    .classList
-    .add("show");
+    element.classList.add("show");
 
 }
 
 
-/* =========================================
-   UPDATE SCORE
-========================================= */
+/* =========================
+   UI 업데이트
+========================= */
 
-function updateScoreUI() {
+function updateUI() {
 
-    document
-    .getElementById("score1")
-    .innerText =
-    scores[1]
-    .toLocaleString();
+    document.getElementById("score1").textContent =
+        scores[1].toLocaleString();
 
+    document.getElementById("score2").textContent =
+        scores[2].toLocaleString();
 
-    document
-    .getElementById("score2")
-    .innerText =
-    scores[2]
-    .toLocaleString();
+    document.getElementById("combo1").textContent =
+        combos[1];
 
-
-    document
-    .getElementById("combo1")
-    .innerText =
-    combos[1];
-
-
-    document
-    .getElementById("combo2")
-    .innerText =
-    combos[2];
+    document.getElementById("combo2").textContent =
+        combos[2];
 
 }
 
 
-/* =========================================
-   END GAME
-========================================= */
+/* =========================
+   게임 종료
+========================= */
 
 function endGame() {
 
-    gameStarted =
-    false;
+    gameStarted = false;
 
-
-    cancelAnimationFrame(
-        animationFrame
-    );
-
-
-    const resultScreen =
-    document.getElementById(
-        "resultScreen"
-    );
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+    }
 
 
     const winner =
-    document.getElementById(
-        "winner"
-    );
+        document.getElementById("winner");
 
 
-    if (
-        scores[1] > scores[2]
-    ) {
+    if (scores[1] > scores[2]) {
 
-        winner.innerText =
-        "🔵 PLAYER 1 WINS!";
+        winner.textContent =
+            "🔵 PLAYER 1 WINS!";
 
-    }
+    } else if (scores[2] > scores[1]) {
 
-    else if (
-        scores[2] > scores[1]
-    ) {
+        winner.textContent =
+            "🔴 PLAYER 2 WINS!";
 
-        winner.innerText =
-        "🔴 PLAYER 2 WINS!";
+    } else {
 
-    }
-
-    else {
-
-        winner.innerText =
-        "🤝 DRAW!";
+        winner.textContent =
+            "🤝 DRAW!";
 
     }
 
 
-    document
-    .getElementById(
-        "resultScore"
-    )
-    .innerHTML =
+    document.getElementById("resultText").innerHTML =
 
-    `
+        "🎵 " + selectedSong +
 
-    🎵 ${selectedSong}
+        "<br>⭐ " + selectedDifficulty +
 
-    <br>
+        "<br><br>" +
 
-    ⭐ ${selectedDifficulty}
+        "🔵 PLAYER 1: <b>" +
+        scores[1].toLocaleString() +
+        "</b>" +
 
-    <br><br>
+        "<br>" +
 
-    🔵 PLAYER 1:
-    <b>
-    ${scores[1].toLocaleString()}
-    </b>
-
-    <br>
-
-    🔴 PLAYER 2:
-    <b>
-    ${scores[2].toLocaleString()}
-    </b>
-
-    <br><br>
-
-    최고 점수를 기록한 플레이어가 승리!
-
-    `;
+        "🔴 PLAYER 2: <b>" +
+        scores[2].toLocaleString() +
+        "</b>";
 
 
-    resultScreen.style.display =
-    "flex";
+    document.getElementById("resultScreen").style.display =
+        "flex";
 
 }
+
+
+/* =========================
+   다시 플레이
+========================= */
+
+document.getElementById("playAgainButton").addEventListener(
+    "click",
+    function() {
+
+        location.reload();
+
+    }
+);
 
 </script>
 
@@ -2434,8 +1693,8 @@ function endGame() {
 """
 
 components.html(
-    GAME_HTML,
-    height=850,
+    html_code,
+    height=900,
     scrolling=False
 )
 ```
