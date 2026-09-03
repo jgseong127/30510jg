@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -11,10 +12,12 @@ st.set_page_config(
 GAME_HTML = r"""
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
 <meta charset="UTF-8">
 
 <style>
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -26,30 +29,41 @@ html, body {
     height: 100%;
     overflow: hidden;
     font-family: Arial, sans-serif;
-    background: #050510;
     color: white;
+    background: #050510;
 }
 
 body {
-    animation: backgroundShift 18s infinite alternate ease-in-out;
+    animation: backgroundShift 20s infinite alternate ease-in-out;
 }
 
 @keyframes backgroundShift {
+
     0% {
-        background: radial-gradient(circle at top, #15154f, #050510 70%);
+        background:
+        radial-gradient(circle at top, #14235c, #050510 70%);
     }
+
     25% {
-        background: radial-gradient(circle at top, #3b1250, #050510 70%);
+        background:
+        radial-gradient(circle at top, #4b155b, #050510 70%);
     }
+
     50% {
-        background: radial-gradient(circle at top, #073d4a, #050510 70%);
+        background:
+        radial-gradient(circle at top, #064d55, #050510 70%);
     }
+
     75% {
-        background: radial-gradient(circle at top, #3a3210, #050510 70%);
+        background:
+        radial-gradient(circle at top, #523a08, #050510 70%);
     }
+
     100% {
-        background: radial-gradient(circle at top, #17264d, #050510 70%);
+        background:
+        radial-gradient(circle at top, #172d63, #050510 70%);
     }
+
 }
 
 #game {
@@ -59,281 +73,461 @@ body {
     overflow: hidden;
 }
 
-/* ================= HUD ================= */
+
+/* ===============================
+   TOP HUD
+================================ */
 
 #topbar {
+
     position: absolute;
+
     top: 18px;
     left: 0;
+
     width: 100%;
+
     display: flex;
+
     justify-content: space-between;
+
     padding: 0 45px;
+
     z-index: 100;
+
     pointer-events: none;
+
 }
 
 .player-score {
-    width: 330px;
-    padding: 18px;
+
+    width: 300px;
+
+    padding: 16px;
+
     border-radius: 18px;
-    background: rgba(0,0,0,0.35);
+
+    background: rgba(0,0,0,0.45);
+
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.15);
+
+    border:
+    1px solid rgba(255,255,255,0.15);
+
 }
 
 .p1 {
-    box-shadow: 0 0 25px rgba(0,255,255,0.2);
+
+    box-shadow:
+    0 0 25px rgba(0,255,255,0.25);
+
 }
 
 .p2 {
-    box-shadow: 0 0 25px rgba(255,0,200,0.2);
+
+    box-shadow:
+    0 0 25px rgba(255,0,200,0.25);
+
 }
 
 .player-name {
-    font-size: 22px;
+
+    font-size: 20px;
+
     font-weight: bold;
+
     letter-spacing: 2px;
+
 }
 
 .score {
-    font-size: 35px;
-    margin-top: 6px;
+
+    font-size: 32px;
+
+    margin-top: 5px;
+
     font-weight: bold;
+
 }
 
 .combo {
-    font-size: 20px;
-    margin-top: 6px;
-    color: #ffd800;
+
+    font-size: 18px;
+
+    margin-top: 5px;
+
+    color: #ffe600;
+
 }
 
 #timerBox {
+
     text-align: center;
-    font-size: 26px;
+
+    font-size: 25px;
+
     font-weight: bold;
-    text-shadow: 0 0 15px white;
+
+    text-shadow:
+    0 0 15px white;
+
+}
+
+#songName {
+
+    font-size: 15px;
+
+    color: #00ffff;
+
+    margin-top: 5px;
+
 }
 
 #difficulty {
+
     font-size: 14px;
-    margin-top: 8px;
-    color: #cccccc;
+
+    color: #dddddd;
+
+    margin-top: 4px;
+
 }
 
-/* ================= PLAY AREA ================= */
+
+/* ===============================
+   ARENA
+================================ */
 
 #arena {
-    position: absolute;
-    top: 100px;
-    width: 100%;
-    height: calc(100% - 100px);
-    display: flex;
-    justify-content: space-around;
-    perspective: 900px;
-}
 
-/* ================= PLAYER BOARD ================= */
+    position: absolute;
+
+    top: 100px;
+
+    width: 100%;
+
+    height: calc(100% - 100px);
+
+    display: flex;
+
+    justify-content: space-around;
+
+    perspective: 900px;
+
+}
 
 .board {
+
     position: relative;
+
     width: 42%;
+
     height: 88%;
-    transform: rotateX(18deg);
-    transform-style: preserve-3d;
+
+    transform:
+    rotateX(18deg);
+
+    transform-style:
+    preserve-3d;
+
 }
 
-/* Lane area */
-
 .lanes {
+
     position: absolute;
+
     width: 100%;
+
     height: 100%;
+
     display: flex;
+
     gap: 10px;
+
     padding: 0 20px;
+
 }
 
 .lane {
+
     position: relative;
+
     flex: 1;
+
     height: 100%;
+
     overflow: visible;
 
     background:
-        linear-gradient(
-            to bottom,
-            rgba(255,255,255,0.03),
-            rgba(0,0,0,0.4)
-        );
 
-    border-left: 1px solid rgba(255,255,255,0.15);
-    border-right: 1px solid rgba(255,255,255,0.08);
+    linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.03),
+        rgba(0,0,0,0.4)
+    );
+
+    border-left:
+    1px solid rgba(255,255,255,0.15);
+
+    border-right:
+    1px solid rgba(255,255,255,0.08);
+
 }
 
-/* ================= JUDGEMENT LINE ================= */
+
+/* ===============================
+   JUDGEMENT LINE
+================================ */
 
 .judgement-line {
+
     position: absolute;
+
     bottom: 12%;
+
     width: 100%;
-    height: 12px;
+
+    height: 10px;
 
     background: white;
 
     box-shadow:
-        0 0 8px white,
-        0 0 20px #00ffff,
-        0 0 45px #00ffff;
 
-    z-index: 20;
+    0 0 8px white,
+
+    0 0 20px #00ffff,
+
+    0 0 45px #00ffff;
+
+    z-index: 30;
+
 }
 
-/* ================= KEY LABEL ================= */
+
+/* ===============================
+   KEYS
+================================ */
 
 .key-label {
+
     position: absolute;
+
     bottom: 2%;
+
     width: 100%;
+
     display: flex;
+
     gap: 10px;
+
     padding: 0 20px;
+
     z-index: 40;
+
 }
 
 .key {
+
     flex: 1;
+
     height: 55px;
 
     display: flex;
+
     justify-content: center;
+
     align-items: center;
 
-    font-size: 25px;
+    font-size: 24px;
+
     font-weight: bold;
 
     border-radius: 12px;
 
-    background: rgba(0,0,0,0.65);
+    background:
+    rgba(0,0,0,0.7);
 
-    border: 2px solid rgba(255,255,255,0.4);
+    border:
+    2px solid rgba(255,255,255,0.4);
 
     transition: 0.08s;
+
 }
 
 .key.active {
-    transform: scale(0.9);
+
+    transform:
+    scale(0.90);
+
     background: white;
+
     color: black;
-    box-shadow: 0 0 25px white;
+
+    box-shadow:
+    0 0 25px white;
+
 }
 
-/* ================= TILE ================= */
+
+/* ===============================
+   TILES
+================================ */
 
 .tile {
+
     position: absolute;
 
-    width: calc(100% - 16px);
+    width:
+    calc(100% - 16px);
+
     left: 8px;
 
-    height: 55px;
+    height: 52px;
 
     border-radius: 12px;
 
-    transform-style: preserve-3d;
-
     box-shadow:
-        0 0 12px currentColor,
-        0 0 30px currentColor;
 
-    transition: transform 0.05s;
+    0 0 12px currentColor,
+
+    0 0 35px currentColor;
+
+    z-index: 15;
+
 }
 
 .tile::after {
+
     content: "";
 
     position: absolute;
 
-    top: 6px;
-    left: 6px;
-    right: 6px;
-    bottom: 6px;
+    top: 5px;
+
+    left: 5px;
+
+    right: 5px;
+
+    bottom: 5px;
 
     border-radius: 8px;
 
-    background: rgba(255,255,255,0.3);
+    background:
+    rgba(255,255,255,0.28);
+
 }
 
 .tile.hit {
-    animation: hitAnimation 0.25s forwards;
+
+    animation:
+    hitAnimation 0.25s forwards;
+
 }
 
 @keyframes hitAnimation {
+
     0% {
-        transform: scale(1);
+
+        transform:
+        scale(1);
+
         opacity: 1;
+
     }
 
     100% {
-        transform: scale(1.8);
+
+        transform:
+        scale(1.8);
+
         opacity: 0;
+
     }
+
 }
 
-/* ================= JUDGEMENT ================= */
+
+/* ===============================
+   JUDGEMENT TEXT
+================================ */
 
 .judge-text {
+
     position: absolute;
 
     left: 50%;
-    top: 45%;
 
-    transform: translate(-50%, -50%);
+    top: 48%;
+
+    transform:
+    translate(-50%, -50%);
 
     font-size: 42px;
+
     font-weight: bold;
 
     opacity: 0;
 
-    pointer-events: none;
-
     z-index: 200;
 
-    text-shadow:
-        0 0 10px white,
-        0 0 30px currentColor;
+    pointer-events: none;
+
 }
 
 .judge-text.show {
-    animation: judgeAnimation 0.7s forwards;
+
+    animation:
+    judgeAnimation 0.7s forwards;
+
 }
 
 @keyframes judgeAnimation {
+
     0% {
+
         opacity: 0;
-        transform: translate(-50%, -40%) scale(0.7);
+
+        transform:
+        translate(-50%, -40%)
+        scale(0.7);
+
     }
 
     30% {
+
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1.2);
+
+        transform:
+        translate(-50%, -50%)
+        scale(1.2);
+
     }
 
     100% {
+
         opacity: 0;
-        transform: translate(-50%, -70%) scale(1);
+
+        transform:
+        translate(-50%, -70%)
+        scale(1);
+
     }
+
 }
 
-/* ================= START SCREEN ================= */
 
-#startScreen,
-#resultScreen {
+/* ===============================
+   MENU
+================================ */
+
+.screen {
+
     position: absolute;
 
     z-index: 1000;
 
     width: 100%;
+
     height: 100%;
 
     display: flex;
@@ -341,23 +535,35 @@ body {
     flex-direction: column;
 
     justify-content: center;
+
     align-items: center;
 
-    background: rgba(0,0,10,0.82);
+    background:
+    rgba(0,0,10,0.88);
 
-    backdrop-filter: blur(12px);
+    backdrop-filter:
+    blur(15px);
+
 }
 
-#resultScreen {
+#resultScreen,
+#countdownScreen {
+
     display: none;
+
 }
 
 .title {
-    font-size: 65px;
-    font-weight: 900;
-    letter-spacing: 8px;
 
-    background: linear-gradient(
+    font-size: 60px;
+
+    font-weight: 900;
+
+    letter-spacing: 7px;
+
+    background:
+
+    linear-gradient(
         90deg,
         #00ffff,
         #ff00ff,
@@ -365,29 +571,113 @@ body {
     );
 
     -webkit-background-clip: text;
+
     color: transparent;
 
-    text-shadow: 0 0 30px rgba(0,255,255,0.3);
 }
 
 .subtitle {
-    margin-top: 20px;
-    font-size: 20px;
+
+    margin-top: 15px;
+
+    font-size: 18px;
+
     color: #cccccc;
+
+}
+
+.menu-section {
+
+    margin-top: 25px;
+
     text-align: center;
-    line-height: 1.8;
+
+}
+
+.menu-title {
+
+    font-size: 20px;
+
+    margin-bottom: 12px;
+
+    color: #00ffff;
+
+}
+
+.buttons {
+
+    display: flex;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+}
+
+.menu-button {
+
+    padding:
+    14px 25px;
+
+    border-radius: 12px;
+
+    border:
+    1px solid rgba(255,255,255,0.25);
+
+    background:
+    rgba(255,255,255,0.08);
+
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+.menu-button:hover {
+
+    transform:
+    scale(1.07);
+
+    border-color:
+    #00ffff;
+
+}
+
+.menu-button.selected {
+
+    background:
+
+    linear-gradient(
+        90deg,
+        #0088ff,
+        #c000ff
+    );
+
+    box-shadow:
+
+    0 0 20px #00ffff;
+
 }
 
 .start-button {
-    margin-top: 35px;
 
-    padding: 18px 70px;
+    margin-top: 28px;
+
+    padding:
+    16px 65px;
 
     border: none;
 
     border-radius: 15px;
 
-    font-size: 25px;
+    font-size: 23px;
+
     font-weight: bold;
 
     cursor: pointer;
@@ -395,219 +685,293 @@ body {
     color: white;
 
     background:
-        linear-gradient(
-            90deg,
-            #00bfff,
-            #b000ff
-        );
+
+    linear-gradient(
+        90deg,
+        #00bfff,
+        #b000ff
+    );
 
     box-shadow:
-        0 0 25px #00bfff,
-        0 0 50px #b000ff;
 
-    transition: 0.2s;
+    0 0 25px #00bfff,
+
+    0 0 50px #b000ff;
+
 }
 
-.start-button:hover {
-    transform: scale(1.08);
+#countdownNumber {
+
+    font-size: 150px;
+
+    font-weight: bold;
+
+    text-shadow:
+
+    0 0 30px #00ffff,
+
+    0 0 70px #ff00ff;
+
 }
-
-.instructions {
-    margin-top: 30px;
-
-    display: flex;
-
-    gap: 80px;
-
-    font-size: 18px;
-}
-
-.instructions div {
-    text-align: center;
-    line-height: 2;
-}
-
-/* ================= RESULT ================= */
 
 #winner {
+
     font-size: 55px;
+
     margin-bottom: 20px;
+
 }
 
 .result-score {
+
     font-size: 25px;
+
     line-height: 2;
+
 }
 
 </style>
 </head>
 
+
 <body>
 
 <div id="game">
 
-    <!-- ================= START ================= -->
 
-    <div id="startScreen">
+<!-- ===============================
+     SONG MENU
+================================ -->
 
-        <div class="title">
-            NEON RHYTHM DUEL
-        </div>
+<div class="screen" id="menuScreen">
 
-        <div class="subtitle">
-            1 VS 1 네온 리듬 배틀<br>
-            약 1분 동안 더 높은 점수를 획득하세요!
-        </div>
+    <div class="title">
+        NEON RHYTHM DUEL
+    </div>
 
-        <div class="instructions">
+    <div class="subtitle">
 
-            <div>
-                🔵 PLAYER 1<br>
-                <b>Q &nbsp; W &nbsp; E &nbsp; R</b>
-            </div>
+        🎮 PLAYER 1: Q W E R
+        &nbsp;&nbsp;&nbsp;
 
-            <div>
-                🔴 PLAYER 2<br>
-                <b>O &nbsp; P &nbsp; [ &nbsp; ]</b>
-            </div>
-
-        </div>
-
-        <button class="start-button" onclick="startGame()">
-            GAME START
-        </button>
+        🎮 PLAYER 2: O P [ ]
 
     </div>
 
 
-    <!-- ================= RESULT ================= -->
+    <div class="menu-section">
 
-    <div id="resultScreen">
-
-        <div id="winner">
-            PLAYER 1 WINS!
+        <div class="menu-title">
+            🎵 SONG SELECT
         </div>
 
-        <div class="result-score" id="resultScore"></div>
+        <div class="buttons">
 
-        <button class="start-button" onclick="location.reload()">
-            PLAY AGAIN
-        </button>
+            <button
+            class="menu-button song selected"
+            data-song="Neon Drive">
+            🌃 Neon Drive
+            </button>
+
+            <button
+            class="menu-button song"
+            data-song="Cyber Rush">
+            ⚡ Cyber Rush
+            </button>
+
+            <button
+            class="menu-button song"
+            data-song="Galaxy Beat">
+            🌌 Galaxy Beat
+            </button>
+
+            <button
+            class="menu-button song"
+            data-song="Final Overload">
+            🔥 Final Overload
+            </button>
+
+        </div>
 
     </div>
 
 
-    <!-- ================= HUD ================= -->
+    <div class="menu-section">
 
-    <div id="topbar">
+        <div class="menu-title">
+            ⭐ DIFFICULTY
+        </div>
 
-        <div class="player-score p1">
+        <div class="buttons">
 
-            <div class="player-name">
-                🔵 PLAYER 1
-            </div>
+            <button
+            class="menu-button difficulty selected"
+            data-difficulty="Easy">
+            EASY
+            </button>
 
-            <div class="score" id="score1">
+            <button
+            class="menu-button difficulty"
+            data-difficulty="Normal">
+            NORMAL
+            </button>
+
+            <button
+            class="menu-button difficulty"
+            data-difficulty="Hard">
+            HARD
+            </button>
+
+            <button
+            class="menu-button difficulty"
+            data-difficulty="Expert">
+            EXPERT
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <button
+    class="start-button"
+    onclick="prepareGame()">
+
+        READY?
+
+    </button>
+
+</div>
+
+
+
+<!-- ===============================
+     COUNTDOWN
+================================ -->
+
+<div
+class="screen"
+id="countdownScreen">
+
+    <div
+    id="countdownNumber">
+
+        3
+
+    </div>
+
+    <div
+    class="subtitle">
+
+        GET READY!
+
+    </div>
+
+</div>
+
+
+
+<!-- ===============================
+     RESULT
+================================ -->
+
+<div
+class="screen"
+id="resultScreen">
+
+    <div
+    id="winner">
+
+        PLAYER 1 WINS!
+
+    </div>
+
+    <div
+    class="result-score"
+    id="resultScore">
+
+    </div>
+
+    <button
+    class="start-button"
+    onclick="location.reload()">
+
+        PLAY AGAIN
+
+    </button>
+
+</div>
+
+
+
+<!-- ===============================
+     HUD
+================================ -->
+
+<div id="topbar">
+
+    <div
+    class="player-score p1">
+
+        <div class="player-name">
+            🔵 PLAYER 1
+        </div>
+
+        <div
+        class="score"
+        id="score1">
+            0
+        </div>
+
+        <div class="combo">
+
+            COMBO:
+            <span id="combo1">
                 0
-            </div>
-
-            <div class="combo">
-                COMBO: <span id="combo1">0</span>
-            </div>
-
-        </div>
-
-
-        <div id="timerBox">
-
-            <div id="timer">
-                01:00
-            </div>
-
-            <div id="difficulty">
-                EASY
-            </div>
-
-        </div>
-
-
-        <div class="player-score p2">
-
-            <div class="player-name">
-                🔴 PLAYER 2
-            </div>
-
-            <div class="score" id="score2">
-                0
-            </div>
-
-            <div class="combo">
-                COMBO: <span id="combo2">0</span>
-            </div>
+            </span>
 
         </div>
 
     </div>
 
 
-    <!-- ================= ARENA ================= -->
+    <div id="timerBox">
 
-    <div id="arena">
-
-        <!-- PLAYER 1 -->
-
-        <div class="board" id="board1">
-
-            <div class="lanes">
-
-                <div class="lane"></div>
-                <div class="lane"></div>
-                <div class="lane"></div>
-                <div class="lane"></div>
-
-            </div>
-
-            <div class="judgement-line"></div>
-
-            <div class="key-label">
-
-                <div class="key" id="key-q">Q</div>
-                <div class="key" id="key-w">W</div>
-                <div class="key" id="key-e">E</div>
-                <div class="key" id="key-r">R</div>
-
-            </div>
-
-            <div class="judge-text" id="judge1"></div>
-
+        <div id="timer">
+            01:00
         </div>
 
+        <div id="songName">
+            Neon Drive
+        </div>
 
-        <!-- PLAYER 2 -->
+        <div id="difficulty">
+            EASY
+        </div>
 
-        <div class="board" id="board2">
+    </div>
 
-            <div class="lanes">
 
-                <div class="lane"></div>
-                <div class="lane"></div>
-                <div class="lane"></div>
-                <div class="lane"></div>
+    <div
+    class="player-score p2">
 
-            </div>
+        <div class="player-name">
+            🔴 PLAYER 2
+        </div>
 
-            <div class="judgement-line"></div>
+        <div
+        class="score"
+        id="score2">
+            0
+        </div>
 
-            <div class="key-label">
+        <div class="combo">
 
-                <div class="key" id="key-o">O</div>
-                <div class="key" id="key-p">P</div>
-                <div class="key" id="key-[">[</div>
-                <div class="key" id="key-]">]</div>
+            COMBO:
 
-            </div>
-
-            <div class="judge-text" id="judge2"></div>
+            <span id="combo2">
+                0
+            </span>
 
         </div>
 
@@ -616,246 +980,462 @@ body {
 </div>
 
 
+
+<!-- ===============================
+     ARENA
+================================ -->
+
+<div id="arena">
+
+
+<!-- PLAYER 1 -->
+
+<div
+class="board"
+id="board1">
+
+    <div class="lanes">
+
+        <div class="lane"></div>
+        <div class="lane"></div>
+        <div class="lane"></div>
+        <div class="lane"></div>
+
+    </div>
+
+    <div
+    class="judgement-line">
+    </div>
+
+    <div
+    class="key-label">
+
+        <div
+        class="key"
+        id="key-q">
+            Q
+        </div>
+
+        <div
+        class="key"
+        id="key-w">
+            W
+        </div>
+
+        <div
+        class="key"
+        id="key-e">
+            E
+        </div>
+
+        <div
+        class="key"
+        id="key-r">
+            R
+        </div>
+
+    </div>
+
+    <div
+    class="judge-text"
+    id="judge1">
+    </div>
+
+</div>
+
+
+
+<!-- PLAYER 2 -->
+
+<div
+class="board"
+id="board2">
+
+    <div class="lanes">
+
+        <div class="lane"></div>
+        <div class="lane"></div>
+        <div class="lane"></div>
+        <div class="lane"></div>
+
+    </div>
+
+    <div
+    class="judgement-line">
+    </div>
+
+    <div
+    class="key-label">
+
+        <div
+        class="key"
+        id="key-o">
+            O
+        </div>
+
+        <div
+        class="key"
+        id="key-p">
+            P
+        </div>
+
+        <div
+        class="key"
+        id="key-[">
+            [
+        </div>
+
+        <div
+        class="key"
+        id="key-]">
+            ]
+        </div>
+
+    </div>
+
+    <div
+    class="judge-text"
+    id="judge2">
+    </div>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
 <script>
 
-/* =========================================================
-   GAME SETTINGS
-========================================================= */
+/* =========================================
+   SETTINGS
+========================================= */
 
 const GAME_DURATION = 60;
 
-const PLAYER1_KEYS = ["q", "w", "e", "r"];
-const PLAYER2_KEYS = ["o", "p", "[", "]"];
+const PLAYER1_KEYS =
+["q", "w", "e", "r"];
+
+const PLAYER2_KEYS =
+["o", "p", "[", "]"];
+
+
+/* =========================================
+   SONG DATA
+========================================= */
+
+const SONGS = {
+
+    "Neon Drive": {
+
+        bpm: 100,
+
+        description:
+        "쉬운 네온 드라이브"
+
+    },
+
+    "Cyber Rush": {
+
+        bpm: 115,
+
+        description:
+        "빠른 사이버 리듬"
+
+    },
+
+    "Galaxy Beat": {
+
+        bpm: 130,
+
+        description:
+        "우주 스타일 비트"
+
+    },
+
+    "Final Overload": {
+
+        bpm: 145,
+
+        description:
+        "최종 고속 배틀"
+
+    }
+
+};
+
+
+/* =========================================
+   DIFFICULTY DATA
+========================================= */
+
+const DIFFICULTIES = {
+
+    "Easy": {
+
+        intervalMultiplier: 1.45,
+
+        doubleChance: 0.03
+
+    },
+
+    "Normal": {
+
+        intervalMultiplier: 1.15,
+
+        doubleChance: 0.10
+
+    },
+
+    "Hard": {
+
+        intervalMultiplier: 0.95,
+
+        doubleChance: 0.22
+
+    },
+
+    "Expert": {
+
+        intervalMultiplier: 0.78,
+
+        doubleChance: 0.38
+
+    }
+
+};
+
 
 const NEON_COLORS = [
+
     "#00ffff",
+
     "#ff00ff",
+
     "#00ff88",
+
     "#ffff00",
+
     "#ff6600",
+
     "#8a2bff"
+
 ];
 
 
-/* =========================================================
+/* =========================================
    GAME STATE
-========================================================= */
+========================================= */
 
-let gameStarted = false;
+let selectedSong =
+"Neon Drive";
 
-let startTime = 0;
+let selectedDifficulty =
+"Easy";
+
+let gameStarted =
+false;
+
+let startTime =
+0;
 
 let animationFrame;
 
 let notes = [];
 
-let audioContext;
-
 let scores = {
+
     1: 0,
     2: 0
+
 };
 
 let combos = {
+
     1: 0,
     2: 0
+
 };
 
-
-/* =========================================================
-   CREATE NOTE
-========================================================= */
-
-function createNote(player, lane, spawnTime) {
-
-    const board = document.getElementById(
-        player === 1 ? "board1" : "board2"
-    );
-
-    const lanes = board.querySelectorAll(".lane");
-
-    const note = document.createElement("div");
-
-    note.className = "tile";
-
-    note.style.background =
-        NEON_COLORS[Math.floor(Math.random() * NEON_COLORS.length)];
-
-    note.style.color = note.style.background;
-
-    lanes[lane].appendChild(note);
-
-    const noteData = {
-
-        player: player,
-
-        lane: lane,
-
-        spawnTime: spawnTime,
-
-        duration: 2500,
-
-        element: note,
-
-        hit: false
-
-    };
-
-    notes.push(noteData);
-}
+let audioContext;
 
 
-/* =========================================================
-   CREATE SONG / RHYTHM PATTERN
-========================================================= */
+/* =========================================
+   MENU BUTTONS
+========================================= */
 
-function generateSong() {
+document
+.querySelectorAll(".song")
+.forEach(button => {
 
-    notes = [];
+    button.addEventListener(
+        "click",
+        () => {
 
-    const totalTime = GAME_DURATION * 1000;
-
-    let time = 1000;
-
-    while (time < totalTime) {
-
-        let progress = time / totalTime;
-
-        let interval;
-
-        /*
-            Difficulty increases gradually
-        */
-
-        if (progress < 0.25) {
-
-            interval = 850;
-
-        } else if (progress < 0.50) {
-
-            interval = 650;
-
-        } else if (progress < 0.75) {
-
-            interval = 480;
-
-        } else {
-
-            interval = 330;
-
-        }
-
-
-        for (let player = 1; player <= 2; player++) {
-
-            let lane = Math.floor(Math.random() * 4);
-
-            createNote(
-                player,
-                lane,
-                time
+            document
+            .querySelectorAll(".song")
+            .forEach(b =>
+                b.classList.remove("selected")
             );
 
+            button
+            .classList.add("selected");
 
-            /*
-                Mid game:
-                sometimes two simultaneous notes
-            */
+            selectedSong =
+            button.dataset.song;
 
-            if (
-                progress > 0.40 &&
-                Math.random() < progress * 0.45
-            ) {
+        }
+    );
 
-                let secondLane;
-
-                do {
-
-                    secondLane =
-                        Math.floor(Math.random() * 4);
-
-                } while (secondLane === lane);
-
-                createNote(
-                    player,
-                    secondLane,
-                    time
-                );
-            }
+});
 
 
-            /*
-                Late game:
-                sometimes three notes
-            */
+document
+.querySelectorAll(".difficulty")
+.forEach(button => {
 
-            if (
-                progress > 0.75 &&
-                Math.random() < 0.30
-            ) {
+    button.addEventListener(
+        "click",
+        () => {
 
-                let thirdLane;
+            document
+            .querySelectorAll(".difficulty")
+            .forEach(b =>
+                b.classList.remove("selected")
+            );
 
-                do {
+            button
+            .classList.add("selected");
 
-                    thirdLane =
-                        Math.floor(Math.random() * 4);
+            selectedDifficulty =
+            button.dataset.difficulty;
 
-                } while (
-                    thirdLane === lane
-                );
+        }
+    );
 
-                createNote(
-                    player,
-                    thirdLane,
-                    time
-                );
-            }
+});
+
+
+/* =========================================
+   PREPARE GAME
+========================================= */
+
+function prepareGame() {
+
+    document
+    .getElementById("menuScreen")
+    .style.display =
+    "none";
+
+
+    document
+    .getElementById("countdownScreen")
+    .style.display =
+    "flex";
+
+
+    let count = 3;
+
+    const countdownElement =
+    document.getElementById(
+        "countdownNumber"
+    );
+
+
+    countdownElement.innerText =
+    count;
+
+
+    const countdown =
+    setInterval(() => {
+
+        count--;
+
+
+        if (count > 0) {
+
+            countdownElement.innerText =
+            count;
 
         }
 
-        time += interval;
+        else if (count === 0) {
 
-    }
+            countdownElement.innerText =
+            "GO!";
+
+        }
+
+        else {
+
+            clearInterval(countdown);
+
+            document
+            .getElementById(
+                "countdownScreen"
+            )
+            .style.display =
+            "none";
+
+            startGame();
+
+        }
+
+    }, 1000);
 
 }
 
 
-/* =========================================================
+/* =========================================
    AUDIO
-========================================================= */
+========================================= */
 
 function initAudio() {
 
     audioContext =
-        new (window.AudioContext || window.webkitAudioContext)();
+    new (
+        window.AudioContext ||
+        window.webkitAudioContext
+    )();
 
 }
 
 
-function playTone(frequency, duration = 0.08, volume = 0.05) {
+function playTone(
+    frequency,
+    duration = 0.08,
+    volume = 0.05
+) {
 
     if (!audioContext) return;
 
     const oscillator =
-        audioContext.createOscillator();
+    audioContext.createOscillator();
 
     const gain =
-        audioContext.createGain();
+    audioContext.createGain();
 
-    oscillator.frequency.value = frequency;
+    oscillator.frequency.value =
+    frequency;
 
-    oscillator.type = "sine";
+    oscillator.type =
+    "sine";
 
-    gain.gain.value = volume;
+    gain.gain.value =
+    volume;
 
     oscillator.connect(gain);
 
-    gain.connect(audioContext.destination);
+    gain.connect(
+        audioContext.destination
+    );
 
     oscillator.start();
 
-    gain.gain.exponentialRampToValueAtTime(
+    gain.gain
+    .exponentialRampToValueAtTime(
         0.001,
         audioContext.currentTime + duration
     );
@@ -867,34 +1447,215 @@ function playTone(frequency, duration = 0.08, volume = 0.05) {
 }
 
 
-function startBackgroundBeat() {
+/* =========================================
+   CREATE NOTE
+========================================= */
 
-    const beatInterval = setInterval(() => {
+function createNote(
+    player,
+    lane,
+    hitTime
+) {
 
-        if (!gameStarted) {
+    const board =
+    document.getElementById(
+        player === 1
+        ? "board1"
+        : "board2"
+    );
 
-            clearInterval(beatInterval);
 
-            return;
-        }
+    const lanes =
+    board.querySelectorAll(".lane");
 
-        playTone(110, 0.12, 0.04);
 
-    }, 500);
+    const note =
+    document.createElement("div");
+
+
+    note.className =
+    "tile";
+
+
+    const color =
+    NEON_COLORS[
+        Math.floor(
+            Math.random()
+            *
+            NEON_COLORS.length
+        )
+    ];
+
+
+    note.style.background =
+    color;
+
+
+    note.style.color =
+    color;
+
+
+    lanes[lane]
+    .appendChild(note);
+
+
+    notes.push({
+
+        player,
+
+        lane,
+
+        hitTime,
+
+        element: note,
+
+        hit: false,
+
+        /*
+        Faster tile movement
+        */
+
+        duration: 1800
+
+    });
 
 }
 
 
-/* =========================================================
+/* =========================================
+   GENERATE SONG
+========================================= */
+
+function generateSong() {
+
+    notes = [];
+
+
+    const song =
+    SONGS[selectedSong];
+
+
+    const difficulty =
+    DIFFICULTIES[
+        selectedDifficulty
+    ];
+
+
+    /*
+    BPM → beat interval
+    */
+
+    const beat =
+    60000 / song.bpm;
+
+
+    let time =
+    2500;
+
+
+    const totalTime =
+    GAME_DURATION * 1000;
+
+
+    while (
+        time < totalTime
+    ) {
+
+        /*
+        Easier spacing
+        */
+
+        let interval =
+        beat
+        *
+        difficulty.intervalMultiplier;
+
+
+        /*
+        Gradually harder
+        */
+
+        const progress =
+        time / totalTime;
+
+
+        for (
+            let player = 1;
+            player <= 2;
+            player++
+        ) {
+
+            const lane =
+            Math.floor(
+                Math.random() * 4
+            );
+
+
+            createNote(
+                player,
+                lane,
+                time
+            );
+
+
+            /*
+            Double notes appear
+            mostly later in song
+            */
+
+            if (
+
+                progress > 0.55
+
+                &&
+
+                Math.random()
+                <
+                difficulty.doubleChance
+                *
+                progress
+
+            ) {
+
+                let lane2;
+
+                do {
+
+                    lane2 =
+                    Math.floor(
+                        Math.random() * 4
+                    );
+
+                }
+
+                while (
+                    lane2 === lane
+                );
+
+
+                createNote(
+                    player,
+                    lane2,
+                    time
+                );
+
+            }
+
+        }
+
+
+        time += interval;
+
+    }
+
+}
+
+
+/* =========================================
    START GAME
-========================================================= */
+========================================= */
 
 function startGame() {
-
-    document.getElementById("startScreen")
-        .style.display = "none";
-
-    gameStarted = true;
 
     scores[1] = 0;
     scores[2] = 0;
@@ -902,116 +1663,161 @@ function startGame() {
     combos[1] = 0;
     combos[2] = 0;
 
+
+    updateScoreUI();
+
+
+    document
+    .getElementById("songName")
+    .innerText =
+    selectedSong;
+
+
+    document
+    .getElementById("difficulty")
+    .innerText =
+    selectedDifficulty.toUpperCase();
+
+
     initAudio();
+
 
     generateSong();
 
-    startTime = performance.now();
 
-    startBackgroundBeat();
+    gameStarted =
+    true;
+
+
+    startTime =
+    performance.now();
+
 
     gameLoop();
 
 }
 
 
-/* =========================================================
+/* =========================================
    GAME LOOP
-========================================================= */
+========================================= */
 
 function gameLoop() {
 
     if (!gameStarted) return;
 
-    const now = performance.now();
+
+    const now =
+    performance.now();
+
 
     const elapsed =
-        now - startTime;
+    now - startTime;
+
 
     const remaining =
-        Math.max(
-            0,
-            GAME_DURATION * 1000 - elapsed
-        );
+    Math.max(
+        0,
+        GAME_DURATION * 1000 - elapsed
+    );
 
 
     updateTimer(remaining);
-
-    updateDifficulty(elapsed);
 
 
     notes.forEach(note => {
 
         if (note.hit) return;
 
-        const noteStart =
-            note.spawnTime - note.duration;
-
-        const progress =
-            (elapsed - noteStart) / note.duration;
-
 
         /*
-            Before appearing
+        Tile starts far away
         */
+
+        const startTimeNote =
+        note.hitTime
+        -
+        note.duration;
+
+
+        const progress =
+        (
+            elapsed
+            -
+            startTimeNote
+        )
+        /
+        note.duration;
+
 
         if (progress < 0) {
 
-            note.element.style.display = "none";
+            note.element.style.display =
+            "none";
 
             return;
 
         }
 
 
-        note.element.style.display = "block";
+        note.element.style.display =
+        "block";
 
 
         /*
-            Perspective movement
-
-            Start small and far away,
-            become bigger near player.
+        Faster perspective movement
         */
 
         const p =
-            Math.min(
-                Math.max(progress, 0),
-                1.2
-            );
+        Math.min(
+            Math.max(progress, 0),
+            1.15
+        );
+
 
         const scale =
-            0.35 + p * 0.75;
+        0.28
+        +
+        p * 0.82;
+
 
         const y =
-            5 + p * 82;
+        2
+        +
+        p * 82;
 
 
         note.element.style.top =
-            y + "%";
+        y + "%";
+
 
         note.element.style.transform =
-            `scale(${scale})`;
+        `scale(${scale})`;
 
 
         /*
-            Missed note
+        Automatic miss
         */
 
-        if (progress > 1.08) {
+        if (progress > 1.10) {
 
             note.hit = true;
 
             note.element.remove();
 
-            registerMiss(note.player);
+            registerMiss(
+                note.player
+            );
 
         }
 
     });
 
 
-    if (elapsed >= GAME_DURATION * 1000) {
+    if (
+        elapsed >=
+        GAME_DURATION * 1000
+    ) {
 
         endGame();
 
@@ -1019,190 +1825,213 @@ function gameLoop() {
 
     }
 
+
     animationFrame =
-        requestAnimationFrame(gameLoop);
+    requestAnimationFrame(
+        gameLoop
+    );
 
 }
 
 
-/* =========================================================
+/* =========================================
    TIMER
-========================================================= */
+========================================= */
 
-function updateTimer(remaining) {
-
-    const totalSeconds =
-        Math.ceil(remaining / 1000);
-
-    const minutes =
-        Math.floor(totalSeconds / 60);
+function updateTimer(
+    remaining
+) {
 
     const seconds =
-        totalSeconds % 60;
-
-    document.getElementById("timer")
-        .innerText =
-            String(minutes).padStart(2, "0")
-            + ":"
-            + String(seconds).padStart(2, "0");
-
-}
+    Math.ceil(
+        remaining / 1000
+    );
 
 
-/* =========================================================
-   DIFFICULTY
-========================================================= */
+    const minutes =
+    Math.floor(
+        seconds / 60
+    );
 
-function updateDifficulty(elapsed) {
 
-    const progress =
-        elapsed / (GAME_DURATION * 1000);
+    const secs =
+    seconds % 60;
 
-    let text;
 
-    if (progress < 0.25) {
+    document
+    .getElementById("timer")
+    .innerText =
 
-        text = "EASY";
+    String(minutes)
+    .padStart(2, "0")
 
-    } else if (progress < 0.50) {
+    +
 
-        text = "NORMAL";
+    ":"
 
-    } else if (progress < 0.75) {
+    +
 
-        text = "HARD";
-
-    } else {
-
-        text = "INSANE";
-
-    }
-
-    document.getElementById("difficulty")
-        .innerText = text;
+    String(secs)
+    .padStart(2, "0");
 
 }
 
 
-/* =========================================================
-   KEYBOARD
-========================================================= */
+/* =========================================
+   KEY INPUT
+========================================= */
 
-document.addEventListener("keydown", event => {
+document.addEventListener(
+    "keydown",
+    event => {
 
-    if (!gameStarted) return;
+        if (!gameStarted)
+        return;
 
-    const key =
+
+        if (event.repeat)
+        return;
+
+
+        const key =
         event.key.toLowerCase();
 
-    /*
-        Prevent browser shortcuts / scrolling
-    */
 
-    if (
-        PLAYER1_KEYS.includes(key) ||
-        PLAYER2_KEYS.includes(key)
-    ) {
+        if (
+            PLAYER1_KEYS.includes(key)
+            ||
+            PLAYER2_KEYS.includes(key)
+        ) {
 
-        event.preventDefault();
+            event.preventDefault();
 
-    }
+        }
 
 
-    if (PLAYER1_KEYS.includes(key)) {
+        if (
+            PLAYER1_KEYS.includes(key)
+        ) {
 
-        const lane =
+            const lane =
             PLAYER1_KEYS.indexOf(key);
 
-        activateKey(key);
 
-        hitLane(1, lane);
-
-    }
+            activateKey(key);
 
 
-    if (PLAYER2_KEYS.includes(key)) {
+            hitLane(
+                1,
+                lane
+            );
 
-        const lane =
+        }
+
+
+        if (
+            PLAYER2_KEYS.includes(key)
+        ) {
+
+            const lane =
             PLAYER2_KEYS.indexOf(key);
 
-        activateKey(key);
 
-        hitLane(2, lane);
+            activateKey(key);
+
+
+            hitLane(
+                2,
+                lane
+            );
+
+        }
 
     }
+);
 
-});
 
+document.addEventListener(
+    "keyup",
+    event => {
 
-document.addEventListener("keyup", event => {
-
-    const key =
+        const key =
         event.key.toLowerCase();
 
-    const element =
-        document.getElementById("key-" + key);
 
-    if (element) {
+        const element =
+        document.getElementById(
+            "key-" + key
+        );
 
-        element.classList.remove("active");
+
+        if (element) {
+
+            element
+            .classList
+            .remove("active");
+
+        }
 
     }
-
-});
+);
 
 
 function activateKey(key) {
 
     const element =
-        document.getElementById("key-" + key);
+    document.getElementById(
+        "key-" + key
+    );
+
 
     if (element) {
 
-        element.classList.add("active");
-
-        setTimeout(() => {
-
-            element.classList.remove("active");
-
-        }, 80);
+        element
+        .classList
+        .add("active");
 
     }
 
 }
 
 
-/* =========================================================
-   HIT SYSTEM
-========================================================= */
+/* =========================================
+   HIT DETECTION
+========================================= */
 
-function hitLane(player, lane) {
+function hitLane(
+    player,
+    lane
+) {
 
     const elapsed =
-        performance.now() - startTime;
+    performance.now()
+    -
+    startTime;
 
-
-    /*
-        Find notes in same lane
-    */
 
     const candidates =
-        notes.filter(note =>
+    notes.filter(note =>
 
-            note.player === player &&
+        note.player === player
 
-            note.lane === lane &&
+        &&
 
-            !note.hit
+        note.lane === lane
 
-        );
+        &&
+
+        !note.hit
+
+    );
 
 
     /*
-        No tile = MISS
+    Empty lane = MISS
     */
 
-    if (candidates.length === 0) {
+    if (
+        candidates.length === 0
+    ) {
 
         registerMiss(player);
 
@@ -1211,34 +2040,41 @@ function hitLane(player, lane) {
     }
 
 
-    /*
-        Find closest note
-    */
+    candidates.sort(
+        (a, b) =>
 
-    candidates.sort((a, b) =>
+        Math.abs(
+            elapsed - a.hitTime
+        )
 
-        Math.abs(elapsed - a.spawnTime)
         -
-        Math.abs(elapsed - b.spawnTime)
+
+        Math.abs(
+            elapsed - b.hitTime
+        )
 
     );
 
 
     const note =
-        candidates[0];
+    candidates[0];
 
 
     const difference =
-        Math.abs(
-            elapsed - note.spawnTime
-        );
+    Math.abs(
+        elapsed
+        -
+        note.hitTime
+    );
 
 
     /*
-        PERFECT
+    PERFECT
     */
 
-    if (difference <= 90) {
+    if (
+        difference <= 110
+    ) {
 
         registerHit(
             player,
@@ -1253,16 +2089,18 @@ function hitLane(player, lane) {
 
 
     /*
-        GREAT
+    GREAT
     */
 
-    if (difference <= 180) {
+    if (
+        difference <= 220
+    ) {
 
         registerHit(
             player,
             note,
             "GREAT",
-            500
+            600
         );
 
         return;
@@ -1271,7 +2109,7 @@ function hitLane(player, lane) {
 
 
     /*
-        Outside judgement area
+    Outside judgement timing
     */
 
     registerMiss(player);
@@ -1279,9 +2117,9 @@ function hitLane(player, lane) {
 }
 
 
-/* =========================================================
+/* =========================================
    HIT
-========================================================= */
+========================================= */
 
 function registerHit(
     player,
@@ -1290,37 +2128,41 @@ function registerHit(
     baseScore
 ) {
 
-    note.hit = true;
+    note.hit =
+    true;
+
 
     combos[player]++;
 
 
     /*
-        Combo bonus
+    Combo bonus
     */
 
     const comboBonus =
-        combos[player] * 10;
+    Math.min(
+        combos[player] * 15,
+        1000
+    );
 
 
     scores[player] +=
-        baseScore + comboBonus;
+
+    baseScore
+
+    +
+
+    comboBonus;
 
 
-    /*
-        Animation
-    */
-
-    note.element.classList.add("hit");
+    note.element
+    .classList
+    .add("hit");
 
 
     setTimeout(() => {
 
-        if (note.element) {
-
-            note.element.remove();
-
-        }
+        note.element.remove();
 
     }, 250);
 
@@ -1331,17 +2173,25 @@ function registerHit(
     );
 
 
-    /*
-        Sound
-    */
+    if (
+        judgement === "PERFECT"
+    ) {
 
-    if (judgement === "PERFECT") {
+        playTone(
+            700,
+            0.07,
+            0.07
+        );
 
-        playTone(660, 0.08, 0.08);
+    }
 
-    } else {
+    else {
 
-        playTone(440, 0.08, 0.06);
+        playTone(
+            500,
+            0.07,
+            0.05
+        );
 
     }
 
@@ -1351,29 +2201,39 @@ function registerHit(
 }
 
 
-/* =========================================================
+/* =========================================
    MISS
-========================================================= */
+========================================= */
 
-function registerMiss(player) {
+function registerMiss(
+    player
+) {
 
-    combos[player] = 0;
+    combos[player] =
+    0;
+
 
     showJudgement(
         player,
         "MISS"
     );
 
-    playTone(120, 0.12, 0.04);
+
+    playTone(
+        130,
+        0.10,
+        0.04
+    );
+
 
     updateScoreUI();
 
 }
 
 
-/* =========================================================
-   SHOW JUDGEMENT
-========================================================= */
+/* =========================================
+   JUDGEMENT DISPLAY
+========================================= */
 
 function showJudgement(
     player,
@@ -1381,141 +2241,189 @@ function showJudgement(
 ) {
 
     const element =
-        document.getElementById(
-            player === 1
-                ? "judge1"
-                : "judge2"
-        );
+    document.getElementById(
+
+        player === 1
+        ?
+
+        "judge1"
+
+        :
+
+        "judge2"
+
+    );
 
 
     element.innerText =
-        judgement;
+    judgement;
 
 
-    if (judgement === "PERFECT") {
+    if (
+        judgement === "PERFECT"
+    ) {
 
         element.style.color =
-            "#00ffff";
+        "#00ffff";
 
     }
 
-    else if (judgement === "GREAT") {
+    else if (
+        judgement === "GREAT"
+    ) {
 
         element.style.color =
-            "#00ff88";
+        "#00ff88";
 
     }
 
     else {
 
         element.style.color =
-            "#ff3355";
+        "#ff3355";
 
     }
 
 
-    element.classList.remove("show");
+    element
+    .classList
+    .remove("show");
+
 
     void element.offsetWidth;
 
-    element.classList.add("show");
+
+    element
+    .classList
+    .add("show");
 
 }
 
 
-/* =========================================================
-   UPDATE UI
-========================================================= */
+/* =========================================
+   UPDATE SCORE
+========================================= */
 
 function updateScoreUI() {
 
-    document.getElementById("score1")
-        .innerText =
-            scores[1].toLocaleString();
+    document
+    .getElementById("score1")
+    .innerText =
+    scores[1]
+    .toLocaleString();
 
 
-    document.getElementById("score2")
-        .innerText =
-            scores[2].toLocaleString();
+    document
+    .getElementById("score2")
+    .innerText =
+    scores[2]
+    .toLocaleString();
 
 
-    document.getElementById("combo1")
-        .innerText =
-            combos[1];
+    document
+    .getElementById("combo1")
+    .innerText =
+    combos[1];
 
 
-    document.getElementById("combo2")
-        .innerText =
-            combos[2];
+    document
+    .getElementById("combo2")
+    .innerText =
+    combos[2];
 
 }
 
 
-/* =========================================================
+/* =========================================
    END GAME
-========================================================= */
+========================================= */
 
 function endGame() {
 
-    gameStarted = false;
+    gameStarted =
+    false;
 
-    cancelAnimationFrame(animationFrame);
+
+    cancelAnimationFrame(
+        animationFrame
+    );
 
 
     const resultScreen =
-        document.getElementById(
-            "resultScreen"
-        );
+    document.getElementById(
+        "resultScreen"
+    );
 
 
     const winner =
-        document.getElementById(
-            "winner"
-        );
+    document.getElementById(
+        "winner"
+    );
 
 
-    if (scores[1] > scores[2]) {
+    if (
+        scores[1] > scores[2]
+    ) {
 
         winner.innerText =
-            "🔵 PLAYER 1 WINS!";
+        "🔵 PLAYER 1 WINS!";
 
     }
 
-    else if (scores[2] > scores[1]) {
+    else if (
+        scores[2] > scores[1]
+    ) {
 
         winner.innerText =
-            "🔴 PLAYER 2 WINS!";
+        "🔴 PLAYER 2 WINS!";
 
     }
 
     else {
 
         winner.innerText =
-            "🤝 DRAW!";
+        "🤝 DRAW!";
 
     }
 
 
-    document.getElementById("resultScore")
-        .innerHTML = `
+    document
+    .getElementById(
+        "resultScore"
+    )
+    .innerHTML =
 
-        🔵 PLAYER 1: 
-        <b>${scores[1].toLocaleString()}</b>
+    `
 
-        <br>
+    🎵 ${selectedSong}
 
-        🔴 PLAYER 2: 
-        <b>${scores[2].toLocaleString()}</b>
+    <br>
 
-        <br><br>
+    ⭐ ${selectedDifficulty}
 
-        최고 점수를 획득한 플레이어가 승리했습니다!
+    <br><br>
 
-        `;
+    🔵 PLAYER 1:
+    <b>
+    ${scores[1].toLocaleString()}
+    </b>
+
+    <br>
+
+    🔴 PLAYER 2:
+    <b>
+    ${scores[2].toLocaleString()}
+    </b>
+
+    <br><br>
+
+    최고 점수를 기록한 플레이어가 승리!
+
+    `;
 
 
     resultScreen.style.display =
-        "flex";
+    "flex";
 
 }
 
@@ -1525,9 +2433,9 @@ function endGame() {
 </html>
 """
 
-
 components.html(
     GAME_HTML,
     height=850,
     scrolling=False
 )
+```
